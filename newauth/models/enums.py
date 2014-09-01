@@ -22,6 +22,7 @@ class CharacterStatus(Enum):
     internal = 'Internal'
     ally = 'Ally'
     ineligible = 'Ineligible'
+    purged = 'Purged'
 
 
 class MessageType(Enum):
