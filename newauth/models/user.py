@@ -119,7 +119,7 @@ class User(db.Model):
             for character in api_key.characters:
                 updated_characters.add(character.id)
             db.session.add(api_key)
-        characters_to_delete = Character.query.filter(db.not_(Character.id.in_(list(updated_characters)))).all()
+        characters_to_delete = Character.query.filter_by(owner=self).filter(db.not_(Character.id.in_(list(updated_characters)))).all()
         for character in characters_to_delete:
             db.session.delete(character)
         if self.main_character_id in characters_to_delete:
