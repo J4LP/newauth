@@ -91,7 +91,7 @@ class LDAPSync(object):
                 c.modify(ldap_user.dn, changes)
                 result = c.result
 
-    def insert_user(self, app, model):
+    def insert_user(self, app, model, password=None):
         with self.connection as c:
             result = c.search(self.app.config['SYNC_LDAP_MEMBERDN'], '(uid={})'.format(model.user_id), SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
             if result:
@@ -99,7 +99,10 @@ class LDAPSync(object):
                     return self.update_user(model)
         ldap_user = LDAPUser.from_sql(model)
         attributes = {k: v for k, v in ldap_user.__dict__['__data__'].iteritems() if v is not None and k != 'dn' and k != 'objectClass' and v}
-        attributes['userPassword'] = ldap_salted_sha1.encrypt(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24)))
+        if not password:
+            attributes['userPassword'] = ldap_salted_sha1.encrypt(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24)))
+        else:
+            attributes['userPassword'] = ldap_salted_sha1.encrypt(password)
         with self.connection as c:
             c.add(ldap_user.dn, object_class=['top', 'account', 'simpleSecurityObject', 'xxPilot'], attributes=attributes)
             result = c.result
@@ -123,7 +126,7 @@ class LDAPSync(object):
     def update_user_password(self, app, model, password):
         ldap_user = self.get_user(model.user_id)
         with self.connection as c:
-            c.modify(ldap_user.dn, {'userPassword': [(MODIFY_REPLACE, [ldap_salted_sha1.encrypt(password)])]})
+            c.modify(ldap_user.dn, {'userPassword': (MODIFY_REPLACE, [ldap_salted_sha1.encrypt(password)])})
             result = c.result
 
 

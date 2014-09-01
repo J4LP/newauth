@@ -149,7 +149,7 @@ class LDAPUser(LDAPDocument):
         self.objectClass = ['top', 'account', 'simpleSecurityObject', 'xxPilot']
         self.uid = model.user_id
         self.email = model.email
-        self.accountStatus = model.status
+        self.accountStatus = model.status if model.status else 'Ineligible'
         if model.main_character:
             self.characterName = model.main_character.name
             self.alliance = model.main_character.alliance_name

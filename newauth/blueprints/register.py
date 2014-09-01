@@ -107,8 +107,7 @@ class RegisterView(FlaskView):
                 flash("Could not save user to database.", "danger")
             else:
                 # Signals for registration
-                User.new_user.send(current_app._get_current_object(), model=user)
-                User.password_updated.send(current_app._get_current_object(), model=user, password=form.password.data)
+                User.new_user.send(current_app._get_current_object(), model=user, password=form.password.data)
                 user.update_keys()
                 user.update_status()
                 session.clear()
