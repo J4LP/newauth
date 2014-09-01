@@ -91,9 +91,9 @@ class LDAPSync(object):
                 c.modify(ldap_user.dn, changes)
                 result = c.result
 
-    def insert_user(self, model):
+    def insert_user(self, app, model):
         with self.connection as c:
-            result = c.search(self.app.config['SYNC_LDAP_MEMBERDN'], '(uid={})'.format(user_id), SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
+            result = c.search(self.app.config['SYNC_LDAP_MEMBERDN'], '(uid={})'.format(model.user_id), SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
             if result:
                 if len(c.response) != 0:
                     return self.update_user(model)
@@ -106,8 +106,9 @@ class LDAPSync(object):
 
     def update_user(self, model):
         ldap_user = self.get_user(model.user_id)
-        ldap_user.update_with_model(model)
-        self.save_user(ldap_user)
+        if ldap_user:
+            ldap_user.update_with_model(model)
+            self.save_user(ldap_user)
 
     def update_membership(self, model):
         session = db.create_scoped_session()
@@ -119,10 +120,10 @@ class LDAPSync(object):
     def delete_user(self, model):
         pass
 
-    def update_user_password(self, change):
-        ldap_user = self.get_user(change[0].user_id)
+    def update_user_password(self, app, model, password):
+        ldap_user = self.get_user(model.user_id)
         with self.connection as c:
-            c.modify(ldap_user.dn, {'userPassword': [(MODIFY_REPLACE, [ldap_salted_sha1.encrypt(change[1])])]})
+            c.modify(ldap_user.dn, {'userPassword': [(MODIFY_REPLACE, [ldap_salted_sha1.encrypt(password)])]})
             result = c.result
 
 

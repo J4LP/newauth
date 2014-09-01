@@ -94,8 +94,10 @@ class RegisterView(FlaskView):
                 email=form.email.data,
                 main_character_id=character.id
             )
-            user.update_password(form.password.data)
             user.api_keys.append(api_key)
+            user.update_password(form.password.data)
+            for character in api_key.get_characters():
+                user.characters.append(character)
             db.session.add(user)
             try:
                 db.session.commit()
@@ -105,8 +107,8 @@ class RegisterView(FlaskView):
                 flash("Could not save user to database.", "danger")
             else:
                 # Signals for registration
-                User.new_user.send(user)
-                User.password_updated.send((user, form.password.data))
+                User.new_user.send(current_app._get_current_object(), model=user)
+                User.password_updated.send(current_app._get_current_object(), model=user, password=form.password.data)
                 user.update_keys()
                 user.update_status()
                 session.clear()
