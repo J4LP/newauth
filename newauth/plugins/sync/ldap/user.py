@@ -97,6 +97,7 @@ class LDAPUser(LDAPDocument):
     vCode = String()
 
     LIST_ATTRIBUTES = ('objectClass', 'authGroup',)
+    INT_ATTRIBUTES = ('keyID',)
 
     def __init__(self):
         self._original_ldap_attributes = {}
@@ -138,8 +139,12 @@ class LDAPUser(LDAPDocument):
                     setattr(user, k, v)
                     user._original_ldap_attributes[k] = v
                 else:
-                    setattr(user, k, v[0])
-                    user._original_ldap_attributes[k] = v[0]
+                    if k in cls.INT_ATTRIBUTES:
+                        setattr(user, k, int(v[0]))
+                        user._original_ldap_attributes[k] = int(v[0])
+                    else:
+                        setattr(user, k, v[0])
+                        user._original_ldap_attributes[k] = v[0]
         return user
 
     def update_with_model(self, model):
