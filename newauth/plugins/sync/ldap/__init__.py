@@ -36,6 +36,7 @@ class LDAPSync(object):
             app.logger.exception(e)
 
         models_committed.connect_via(app)(self.handle_commit)
+        User.new_user.connect_via(app)(self.insert_user)
         User.password_updated.connect_via(app)(self.update_user_password)
 
     def setup_connection(self):
@@ -91,6 +92,11 @@ class LDAPSync(object):
                 result = c.result
 
     def insert_user(self, model):
+        with self.connection as c:
+            result = c.search(self.app.config['SYNC_LDAP_MEMBERDN'], '(uid={})'.format(user_id), SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
+            if result:
+                if len(c.response) != 0:
+                    return self.update_user(model)
         ldap_user = LDAPUser.from_sql(model)
         attributes = {k: v for k, v in ldap_user.__dict__['__data__'].iteritems() if v is not None and k != 'dn' and k != 'objectClass' and v}
         attributes['userPassword'] = ldap_salted_sha1.encrypt(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24)))

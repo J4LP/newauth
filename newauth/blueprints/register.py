@@ -96,8 +96,6 @@ class RegisterView(FlaskView):
             )
             user.update_password(form.password.data)
             user.api_keys.append(api_key)
-            for character in api_key.get_characters():
-                user.characters.append(character)
             db.session.add(user)
             try:
                 db.session.commit()
@@ -106,7 +104,11 @@ class RegisterView(FlaskView):
                 db.session.rollback()
                 flash("Could not save user to database.", "danger")
             else:
+                # Signals for registration
+                User.new_user.send(user)
                 User.password_updated.send((user, form.password.data))
+                user.update_keys()
+                user.update_status()
                 session.clear()
                 flash("Account created! Login now with {} and get started!".format(user.user_id), 'success')
                 return redirect(url_for('AccountView:login'))

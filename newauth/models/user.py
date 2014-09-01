@@ -29,6 +29,7 @@ class User(db.Model):
     messages = db.relationship('Message', backref=db.backref('created_by', cascade="all,delete"), primaryjoin='User.id == Message.created_by_id', cascade='all,delete')
 
     password_updated = newauth_signals.signal('user-updated-password')
+    new_user = newauth_signals.signal('user-new')
 
     def update_password(self, new_password):
         """Hash a new password to bcrypt.
