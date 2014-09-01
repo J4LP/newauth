@@ -97,6 +97,7 @@ class AuthContact(db.Model):
                 if contact.contactTypeID in CHARACTER_TYPES:
                     pass  # We don't really care about character contacts
                 elif contact.contactTypeID in CORPORATION_TYPES:
+                    contacts_updated.add(sheet.corporationID)
                     sheet = EveAPIQuery(public=True).get('corp/CorporationSheet', corporationID=contact.contactID)
                     if sheet.corporationID not in contacts_updated:
                         contacts_updated.add(sheet.corporationID)
