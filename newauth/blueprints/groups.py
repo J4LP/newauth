@@ -270,8 +270,9 @@ class GroupsView(FlaskView):
         membership = group.members.filter_by(user_id=user_id).first()
         if not membership:
             abort(404)
+        user = membership.user.name
         db.session.delete(membership)
         db.session.commit()
-        flash('User "{}" was removed from the group "{}"'.format(membership.user.name, group.name), 'success')
+        flash('User "{}" was removed from the group "{}"'.format(user, group.name), 'success')
         return redirect(url_for('GroupsView:get', name=group.name))
 
