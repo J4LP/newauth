@@ -1,0 +1,27 @@
+{% extends "_layouts/base.html" %}
+
+{% block content %}
+<div class="register-index row">
+    <div class="register-header col-md-6 col-md-offset-3">
+        <h1><img src="{{ url_for('static', filename='img/logo.png') }}" alt=""/>Register</h1>
+        <hr>
+    </div>
+    <div class="register-messages col-md-6 col-md-offset-3">
+        {% for message in Message.display_for('register') %}
+            {{ message }}
+        {% endfor %}
+    <div class="alert alert-warning">Yello</div>
+    </div>
+    <div class="register-box col-md-6 col-md-offset-3">
+        <div class="well">
+            <p>Welcome to {{ config.EVE.auth_name }}!</p>
+            <p>In order to access our services, we need you to create an account so you can join us and access the different services we offer.</p>
+            <p>Who are you?</p>
+            <a class="btn btn-block btn-success btn-lg" href="{{ url_for('RegisterView:api', type='internal') }}"><i class="fa fa-users"></i> I'm in {{ config.EVE.auth_name }} at this very moment</a>
+            <a class="btn btn-block btn-primary btn-lg" href="#"><i class="fa fa-child"></i> I have been accepted to {{ config.EVE.auth_name }}</a>
+            <a class="btn btn-block btn-info btn-lg" href="#"><i class="fa fa-support"></i> I am an ally of {{ config.EVE.auth_name }}</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

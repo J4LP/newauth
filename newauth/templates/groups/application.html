@@ -1,0 +1,21 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-group fa-fw"></i> {{ group.name }}</h1>
+        <hr/>
+    </div>
+    <div class="col-md-6 col-md-offset-3">
+        <p>You are currently applying to join the group <strong>{{ group.name }}</strong>. Please fill in your application text and hit the submit button. At any moment you are able to remove your application on the group page.</p>
+        <div class="well">
+            {% call macros.render_form(group_application_form, action_url=url_for('GroupsView:apply', name=group.name), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                {{ macros.render_field(group_application_form.application_text, placeholder='Application', horizontal=True) }}
+            {% endcall %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

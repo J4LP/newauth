@@ -1,0 +1,274 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-group fa-fw"></i> {{ group.name }} {% if membership.is_admin %}<button class="btn btn-primary pull-right" data-toggle="modal" data-target="#edit-group"><i class="fa fa-edit"></i> Edit group</button>{% endif %}</h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-turquoise">
+            <div class="panel-heading">
+                <h4 class="panel-title">Group information</h4>
+            </div>
+            <div class="panel-body">
+                <dl class="dl-horizontal">
+                    <dt>Description</dt>
+                    <dd>{{ group.description }}</dd>
+                    <dt>Created on</dt>
+                    <dd>{{ group.created_on|format_datetime }}</dd>
+                    {% if group.public_members or membership.is_admin %}
+                        <dt>Members</dt>
+                        <dd>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-turquoise">
+            <div class="panel-heading">
+                <h4 class="panel-title"><a href="#" data-toggle="collapse" data-target="#panel-membership">Your membership</a></h4>
+            </div>
+            <div class="panel-body collapse in" id="panel-membership">
+                {% if membership.is_applying %}
+                    <dl class="dl-horizontal">
+                        <dt>Status</dt>
+                        <dd>Applying</dd>
+                        <dt>Application text</dt>
+                        <dd>{{ membership.application_text }}</dd>
+                        <dt>Applied on</dt>
+                        <dd>{{ membership.applied_on|format_datetime }} <small>{{ membership.applied_on|humanize }}</small></dd>
+                    </dl>
+                    <form action="{{ url_for('GroupsView:retract_application', name=group.name) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-sm btn-warning"><i class="fa fa-fw fa-times"></i> Retract application</button>
+                    </form>
+                {% else %}
+                    <dl class="dl-horizontal">
+                        <dt>Status</dt>
+                        <dd>Member</dd>
+                        <dt>Joined on</dt>
+                        <dd>{{ membership.joined_on|format_datetime }} <small>{{ membership.joined_on|humanize }}</small></dd>
+                        <dt>Permissions</dt>
+                        <dd><span class="label label-default">Member</span> {% if membership.is_admin %}<span class="label label-success">Admin</span>{% endif %} {% if membership.can_ping %}<span class="label label-info">Ping</span>{% endif %}</dd>
+                    </dl>
+                    <form action="{{ url_for('GroupsView:leave', name=group.name) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit"class="btn btn-warning btn-sm"><i class="fa fa-fw fa-sign-out"></i> Leave</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% if membership.is_admin %}
+        <div class="panel panel-turquoise">
+            <div class="panel-heading">
+                <h4 class="panel-title"><a href="#" data-toggle="collapse" data-target="#panel-applications">Applications</a></h4>
+            </div>
+            <table class="table table-responsive collapse in" id="panel-applications">
+                <thead>
+                    <tr>
+                        <th>Character Name</th>
+                        <th>Corporation</th>
+                        <th>Alliance</th>
+                        <th>Application text</th>
+                        <th>Applied on</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in group.members.filter_by(is_applying=True).all() %}
+                        <tr>
+                            <td>{{ application.user.main_character.name }}</td>
+                            <td>{{ application.user.main_character.corporation_name }}</td>
+                            <td>{{ application.user.main_character.alliance_name }}</td>
+                            <td><a href="#" data-toggle="popover" data-content="{{ application.application_text }}" data-trigger="hover" title="Application text">Hover for application text</a></td>
+                            <td><abbr data-toggle="tooltip" title="{{ application.joined_on|format_datetime }}">{{ application.joined_on|humanize }}</abbr></td >
+                            <td>
+                                <div class="btn-group pull-right">
+                                    <button class="btn btn-success btn-xs js-accept-application" data-loading-text="Loading..." data-user="{{ application.user.id }}"><i class="fa fa-fw fa-check"></i> Accept</button>
+                                    <button class="btn btn-danger btn-xs js-reject-application" data-loading-text="Loading..." data-user="{{ application.user.id }}"><i class="fa fa-fw fa-times"></i> Reject</button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                        <td colspan="6">No applications received.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if not membership.is_applying %}
+        <div class="panel panel-turquoise">
+            <div class="panel-heading">
+                <h4 class="panel-title">Member list</h4>
+            </div>
+            {% if group.public_members %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Character name</th>
+                        <th>Corporation</th>
+                        <th>Alliance</th>
+                        <th>Joined on</th>
+                        {% if membership.is_admin %}
+                            <th class="text-right">Actions</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for member in group.members.all() %}
+                        <tr>
+                            <td>{{ member.user.main_character.name }}</td>
+                            <td>{{ member.user.main_character.corporation_name }}</td>
+                            <td>{{ member.user.main_character.alliance_name }}</td>
+                            <td><abbr data-toggle="tooltip"
+                                      title="{{ member.joined_on|format_datetime }}">{{ member.joined_on|humanize }}</abbr>
+                            </td>
+                            {% if membership.is_admin %}
+                                <td class="text-right">
+                                    <div class="btn-group">
+                                        {% if member.is_admin %}
+                                            <button class="btn btn-success btn-xs js-remove-admin" data-loading-text="Loading..." data-user="{{ member.user.id }}">Remove admin</button>
+                                        {% else %}
+                                            <button class="btn btn-success btn-xs js-make-admin" data-loading-text="Loading..." data-user="{{ member.user.id }}">Make admin</button>
+                                        {% endif %}
+                                        {% if member.can_ping %}
+                                            <button class="btn btn-info btn-xs js-remove-ping" data-loading-text="Loading..." data-user="{{ member.user.id }}">Remove ping</button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-xs js-make-ping" data-loading-text="Loading..." data-user="{{ member.user.id }}">Make pinger</button>
+                                        {% endif %}
+                                        <button class="btn btn-danger btn-xs js-kick" data-loading-text="Loading..." data-user="{{ member.user.id }}">Kick</button>
+                                    </div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="panel-body">
+                <p>This group has not made his member list public.</p>
+                </div>
+            {% endif %}
+
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% if membership.is_admin %}
+<div class="modal fade" id="edit-group">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Editing group</h4>
+            </div>
+            {% call macros.render_form(group_edit_form, action_url=url_for('GroupsView:get', name=group.name), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                <div class="modal-body">
+                    {{ macros.render_field(group_edit_form.description, horizontal=True) }}
+                    {{ macros.render_field(group_edit_form.type, horizontal=True) }}
+                    {{ macros.render_checkbox_field(group_edit_form.public_members, horizontal=True) }}
+                </div>
+            <div class="modal-footer">
+            {% endcall %}
+            </div>
+        </div>
+    </div>
+</div>
+<form id="remove-admin" action="{{ url_for('GroupsView:remove_admin', name=group.name) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="user_id">
+</form>
+<form id="make-admin" action="{{ url_for('GroupsView:make_admin', name=group.name) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="user_id">
+</form>
+<form id="remove-ping" action="{{ url_for('GroupsView:remove_ping', name=group.name) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="user_id">
+</form>
+<form id="make-ping" action="{{ url_for('GroupsView:make_ping', name=group.name) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="user_id">
+</form>
+<form id="kick" action="{{ url_for('GroupsView:kick', name=group.name) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="user_id">
+</form>
+<form id="accept-application" action="{{ url_for('GroupsView:accept_application', name=group.name) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="user_id">
+</form>
+<form id="reject-application" action="{{ url_for('GroupsView:reject_application', name=group.name) }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="user_id">
+</form>
+<script>
+$(function() {
+    $('[data-toggle=tooltip]').tooltip('hide');
+    var csrfToken = $('meta[name=csrf-token]').attr('content')
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken)
+            }
+        }
+    });
+
+    var removeAdmin = function(e) {
+        $(this).button('loading')
+        $('#remove-admin input[name=user_id]').val($(this).data('user'))
+        $('#remove-admin').submit()
+    }
+    var makeAdmin = function(e) {
+        $(this).button('loading')
+        $('#make-admin input[name=user_id]').val($(this).data('user'))
+        $('#make-admin').submit()
+    }
+    var removePing = function(e) {
+        $(this).button('loading')
+        $('#remove-ping input[name=user_id]').val($(this).data('user'))
+        $('#remove-ping').submit()
+    }
+    var makePing = function(e) {
+        $(this).button('loading')
+        $('#make-ping input[name=user_id]').val($(this).data('user'))
+        $('#make-ping').submit()
+    }
+    var kick = function(e) {
+        $(this).button('loading')
+        $('#kick input[name=user_id]').val($(this).data('user'))
+        $('#kick').submit()
+    }
+    var acceptApplication = function(e) {
+        $(this).button('loading')
+        $('#accept-application input[name=user_id]').val($(this).data('user'))
+        $('#accept-application').submit()
+    }
+    var rejectApplication = function(e) {
+        $(this).button('loading')
+        $('#reject-application input[name=user_id]').val($(this).data('user'))
+        $('#reject-application').submit()
+    }
+    $('.js-remove-admin').on('click', removeAdmin)
+    $('.js-make-admin').on('click', makeAdmin)
+    $('.js-remove-ping').on('click', removePing)
+    $('.js-make-ping').on('click', makePing)
+    $('.js-kick').on('click', kick)
+    $('.js-accept-application').on('click', acceptApplication)
+    $('.js-reject-application').on('click', rejectApplication)
+})
+</script>
+{% endif %}
+<script>
+$(function() {
+    $('[data-toggle=tooltip]').tooltip('hide');
+    $('[data-toggle=popover]').popover('hide');
+})
+</script>
+{% endblock %}

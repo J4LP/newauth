@@ -1,0 +1,15 @@
+{
+  "name": "NewAuth",
+  "version": "0.0.1",
+  "authors": [
+    "adrien-f <adrien.fillon@gmail.com>"
+  ],
+  "description": "Flexible and extensible Eve Online authentication platform.",
+  "license": "MIT",
+  "private": true,
+  "ignore": [],
+  "dependencies": {
+    "bootstrap": "~3.2.0",
+    "jquery": "~2.1.1"
+  }
+}

@@ -1,0 +1,115 @@
+{% extends "_layouts/base.html" %}
+
+{% from 'macros.html' import group_icon %}
+{% import 'macros.html' as macros %}
+
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1><i class="fa fa-group fa-fw"></i> Groups</h1>
+            <hr/>
+        </div>
+    </div>
+    <div class="row groups-filter">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search groups">
+                <span class="input-group-btn">
+                    <button class="btn btn-default"><i class="fa fa-search fa-fw"></i>Search</button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="btn-group btn-group-justified">
+                <div class="btn-group">
+                    <button class="btn btn-primary">All groups</button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success">My groups</button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-info">My pending groups</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row groups-list">
+        <div class="col-md-12">
+            <ul class="list-inline">
+                <li><i class="fa fa-fw fa-eye"></i> Public group</li>
+                <li><i class="fa fa-fw fa-eye-slash"></i> Hidden group</li>
+                <li><i class="fa fa-fw fa-question"></i> Private group <small>(application needed)</small></li>
+            </ul>
+        </div>
+        <div class="col-md-12">
+            <div class="list-group">
+                {% for group in groups %}
+                    {% if current_user.has_applied_to(group) %}
+                        <a class="list-group-item list-group-item-info" href="{{ url_for('GroupsView:get', name=group.name) }}">
+                    {% elif current_user.is_member_of(group) %}
+                        <a class="list-group-item list-group-item-success" href="{{ url_for('GroupsView:get', name=group.name) }}">
+                    {% elif group.get_type() == GroupType.private %}
+                        <a class="list-group-item" href="{{ url_for('GroupsView:apply', name=group.name) }}">
+                    {% else %}
+                        <a class="list-group-item js-join-group" href="#" data-group={{ group.id }} data-name="{{ group.name }}">
+                    {% endif %}
+                <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
+                <p class="list-group-item-text">{{ group.description }}</p>
+                </a>
+                {% endfor %}
+                {% if current_user.is_admin() %}
+                    <a href="#new_group" class="list-group-item" data-toggle="modal" data-target="#new-group"><i class="fa fa-plus fa-fw"></i> New Group</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if current_user.is_admin() %}
+    <div class="modal fade" id="new-group">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">New group</h4>
+            </div>
+            {% call macros.render_form(new_group_form, action_url=url_for('GroupsView:new_group'), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                <div class="modal-body">
+                    {{ macros.render_field(new_group_form.name, placeholder='Name', horizontal=True) }}
+                    {{ macros.render_field(new_group_form.description, placeholder='Description', horizontal=True) }}
+                    {{ macros.render_field(new_group_form.type, horizontal=True) }}
+                    {{ macros.render_checkbox_field(new_group_form.public_members, horizontal=True) }}
+                </div>
+                <div class="modal-footer">
+            {% endcall %}
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+    <div class="modal fade" id="join-group">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Join group <span class="js-group-name"></span></h4>
+                </div>
+                {% call macros.render_form(new_group_form, action_url=url_for('GroupsView:join'), action_text='<i class="fa fa-check fa-fw"></i> Join', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                    <div class="modal-body">
+                        <input type="hidden" name="group_id"/>
+                        <p>Do you wish to join the group <span class="js-group-name"></span>?</p>
+                    </div>
+                    <div class="modal-footer">
+                {% endcall %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function() {
+            $('.js-join-group').on('click', function(e) {
+                e.preventDefault()
+                $('input[name=group_id]').val($(this).data('group'))
+                $('#join-group span.js-group-name').text($(this).data('name'))
+                $('#join-group').modal('show')
+            })
+        })
+    </script>
+{% endblock %}

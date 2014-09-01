@@ -1,0 +1,71 @@
+@import "../bower_components/bootstrap/less/bootstrap.less";
+
+@turquoise: #1abc9c;
+@green_sea: #16a085;
+@emerald: #2ecc71;
+@nephritis: #27ae60;
+@peter_river: #3498db;
+@belize_hole: #2980b9;
+@amethyst: #9b59b6;
+@wisteria: #8e44ad;
+@wet_asphalt: #34495e;
+@midnight_blue: #2c3e50;
+@sun_flower: #f1c40f;
+@orange: #f39c12;
+@carrot: #e67e22;
+@pumpkin: #d35400;
+@alizarin: #e74c3c;
+@pomegranate: #c0392b;
+@clouds: #ecf0f1;
+@silver: #bdc3c7;
+@concrete: #95a5a6;
+@asbestos: #7f8c8d;
+
+@font-family-sans-serif: 'Open Sans', sans-serif;
+
+@navbar-default-color: #fff;
+@navbar-default-bg: @turquoise;
+@navbar-default-border: @navbar-default-bg;
+
+// Navbar links
+@navbar-default-link-color:                #fff;
+@navbar-default-link-hover-color:          #fff;
+@navbar-default-link-hover-bg:             darken(@navbar-default-bg, 6.5%);
+@navbar-default-link-active-color:         #fff;
+@navbar-default-link-active-bg:            darken(@navbar-default-bg, 6.5%);
+@navbar-default-link-disabled-color:       #ccc;
+@navbar-default-link-disabled-bg:          transparent;
+
+// Navbar brand label
+@navbar-default-brand-color:               @navbar-default-link-color;
+@navbar-default-brand-hover-color:         darken(@navbar-default-brand-color, 10%);
+@navbar-default-brand-hover-bg:            darken(@navbar-default-bg, 6.5%);
+
+// Navbar toggle
+@navbar-default-toggle-hover-bg:           darken(@navbar-default-bg, 6.5%);
+@navbar-default-toggle-icon-bar-bg:        #fff;
+@navbar-default-toggle-border-color:       darken(@navbar-default-bg, 6.5%);
+
+.btn-peter {
+  .button-variant(#fff, @peter_river, darken(@peter_river, 5%));
+}
+
+.btn-nephritis {
+  .button-variant(#fff, @nephritis, darken(@nephritis, 5%));
+}
+
+.btn-alizarin {
+  .button-variant(#fff, @alizarin, @alizarin);
+}
+
+.btn-green-sea {
+  .button-variant(#fff, @green_sea, @green_sea);
+}
+
+.btn-carrot {
+  .button-variant(#fff, @carrot, @carrot);
+}
+
+.panel-turquoise {
+    .panel-variant(@turquoise; #fff; @turquoise; @turquoise);
+}

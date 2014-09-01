@@ -1,0 +1,136 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-group fa-fw"></i> {{ group.name }} <small>Group details</small> <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#edit-group"><i class="fa fa-fw fa-edit"></i> Edit</button></h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Character name</th>
+                <th>Corporation</th>
+                <th>Alliance</th>
+                <th>Joined on</th>
+                <th class="text-right">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for member in group.members.all() %}
+                <tr>
+                    <td>{{ member.user.main_character.name }}</td>
+                    <td>{{ member.user.main_character.corporation_name }}</td>
+                    <td>{{ member.user.main_character.alliance_name }}</td>
+                    <td><abbr data-toggle="tooltip" title="{{ member.joined_on|format_datetime }}">{{ member.joined_on|humanize }}</abbr></td>
+                    <td class="text-right">
+                        <div class="btn-group">
+                            {% if member.is_admin %}
+                                <button class="btn btn-success btn-xs js-remove-admin" data-loading-text="Loading..." data-user="{{ member.user.id }}">Remove admin</button>
+                            {% else %}
+                                <button class="btn btn-success btn-xs js-make-admin" data-loading-text="Loading..." data-user="{{ member.user.id }}">Make admin</button>
+                            {% endif %} 
+                            {% if member.can_ping %}
+                                <button class="btn btn-info btn-xs js-remove-ping" data-loading-text="Loading..." data-user="{{ member.user.id }}">Remove ping</button>
+                            {% else %}
+                                <button class="btn btn-info btn-xs js-make-ping" data-loading-text="Loading..." data-user="{{ member.user.id }}">Make pinger</button>
+                            {% endif %}
+                            <button class="btn btn-danger btn-xs js-kick" data-loading-text="Loading..."
+                               data-user="{{ member.user.id }}">Kick</button>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="edit-group">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Editing group: {{ group.name }}</h4>
+        </div>
+        {% call macros.render_form(group_edit_form, action_url=url_for('AccountView:new_api'), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+            <div class="modal-body">
+                <div class="alert alert-warning">This will trigger a refresh of your account. Your access to
+                    services might be disabled as a result.
+                </div>
+{#                {{ macros.render_field(new_api_form.key_id, placeholder='KeyID', horizontal=True) }}#}
+{#                {{ macros.render_field(new_api_form.vcode, placeholder='vCode', horizontal=True) }}#}
+            </div>
+        <div class="modal-footer">
+        {% endcall %}
+        </div>
+    </div>
+</div>
+</div>
+    <form id="remove-admin" action="{{ url_for('GroupsView:remove_admin', name=group.name) }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="user_id">
+    </form>
+    <form id="make-admin" action="{{ url_for('GroupsView:make_admin', name=group.name) }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="user_id">
+    </form>
+    <form id="remove-ping" action="{{ url_for('GroupsView:remove_ping', name=group.name) }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="user_id">
+    </form>
+    <form id="make-ping" action="{{ url_for('GroupsView:make_ping', name=group.name) }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="user_id">
+    </form>
+    <form id="kick" action="{{ url_for('GroupsView:kick', name=group.name) }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="user_id">
+    </form>
+<script>
+$(function() {
+    $('[data-toggle=tooltip]').tooltip('hide');
+    var csrfToken = $('meta[name=csrf-token]').attr('content')
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken)
+            }
+        }
+    });
+
+    var removeAdmin = function(e) {
+        $(this).button('loading')
+        $('#remove-admin input[name=user_id]').val($(this).data('user'))
+        $('#remove-admin').submit()
+    }
+    var makeAdmin = function(e) {
+        $(this).button('loading')
+        $('#make-admin input[name=user_id]').val($(this).data('user'))
+        $('#make-admin').submit()
+    }
+    var removePing = function(e) {
+        $(this).button('loading')
+        $('#remove-ping input[name=user_id]').val($(this).data('user'))
+        $('#remove-ping').submit()
+    }
+    var makePing = function(e) {
+        $(this).button('loading')
+        $('#make-ping input[name=user_id]').val($(this).data('user'))
+        $('#make-ping').submit()
+    }
+    var kick = function(e) {
+        $(this).button('loading')
+        $('#kick input[name=user_id]').val($(this).data('user'))
+        $('#kick').submit()
+    }
+    $('.js-remove-admin').on('click', removeAdmin)
+    $('.js-make-admin').on('click', makeAdmin)
+    $('.js-remove-ping').on('click', removePing)
+    $('.js-make-ping').on('click', makePing)
+    $('.js-kick').on('click', kick)
+})
+</script>
+{% endblock %}

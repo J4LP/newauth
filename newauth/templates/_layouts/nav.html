@@ -1,0 +1,20 @@
+<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#newauth-nav">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">
+                {{ config.EVE.auth_name }} <i class="fa fa-key"></i> Auth
+            </a>
+        </div>
+        <div class="collapse navbar-collapse" id="newauth-nav">
+            <ul class="nav navbar-nav">
+                <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('AccountView:profile') }}"><i class="fa fa-user"></i> Account</a></li>
+                <li><a href="{{ url_for('GroupsView:index') }}"><i class="fa fa-group"></i> Groups</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

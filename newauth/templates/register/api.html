@@ -1,0 +1,31 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block content %}
+<div class="register-api row">
+    <div class="register-header col-md-6 col-md-offset-3">
+        <h1><img src="{{ url_for('static', filename='img/logo.png') }}" alt=""/>Register - {{ registration_type.capitalize() }}</h1>
+        <hr>
+    </div>
+    <div class="register-messages col-md-6 col-md-offset-3">
+        {% for message in Message.display_for('register') %}
+            {{ message }}
+        {% endfor %}
+    <div class="alert alert-warning">Yello</div>
+    </div>
+    <div class="register-box col-md-6 col-md-offset-3">
+        <div class="well">
+            {% if registration_type == 'internal' %}
+                <p>Are you already a member of {{ config.EVE.auth_name }}?</p>
+                <p>If so, please click on the following link to create a new API Key from Eve Online's website:</p>
+                <a href=""><h3 class="register-api-link">CLICK HERE TO GENERATE AN API, CHECK NO EXPIRY, NAME IT, TOUCH NOTHING ELSE AND HIT SUBMIT</h3></a>
+            {% endif %}
+            {% call macros.render_form(form, action_url=url_for('RegisterView:api', type=registration_type), action_text='Continue', class_='register-member-form', btn_class='btn btn-block btn-success') %}
+                {{ macros.render_field(form.key_id, label_visible=False, placeholder='Key ID') }}
+                {{ macros.render_field(form.vcode, label_visible=False, placeholder='vCode') }}
+            {% endcall %}
+        </div>
+    </div>
+</div>
+{% endblock %}
