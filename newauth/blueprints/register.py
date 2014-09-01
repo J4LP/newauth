@@ -106,7 +106,7 @@ class RegisterView(FlaskView):
                 current_app.logger.exception(e)
                 flash("Could not save user to database.", "danger")
             else:
-                User.password_updated.send(user, form.password.data)
+                User.password_updated.send((user, form.password.data))
                 session.clear()
                 flash("Account created! Login now with {} and get started!".format(user.user_id), 'success')
                 return redirect(url_for('AccountView:login'))

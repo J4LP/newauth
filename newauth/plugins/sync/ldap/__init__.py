@@ -107,10 +107,10 @@ class LDAPSync(object):
     def delete_user(self, model):
         pass
 
-    def update_user_password(self, model, password):
-        ldap_user = self.get_user(model.user_id)
+    def update_user_password(self, change):
+        ldap_user = self.get_user(change[0].user_id)
         with self.connection as c:
-            c.modify(ldap_user.dn, {'userPassword': [(MODIFY_REPLACE, [password])]})
+            c.modify(ldap_user.dn, {'userPassword': [(MODIFY_REPLACE, [change[1]])]})
             result = c.result
 
 
