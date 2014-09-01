@@ -1,6 +1,6 @@
 import os
 from blinker import Namespace
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_wtf import CsrfProtect
 
 newauth_signals = Namespace()
@@ -39,6 +39,10 @@ def create_app():
     # Initialize NewAuth plugins
     from newauth.plugins.sync.ldap import LDAPSync
     LDAPSync(app)
+
+    @app.route('/')
+    def home():
+        return redirect(url_for('AccountView:login'))
 
     @app.context_processor
     def inject_globals():

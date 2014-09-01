@@ -10,22 +10,6 @@ from newauth.models.enums import CharacterStatus
 class RegisterView(FlaskView):
 
     def index(self):
-        p = User.query.filter_by(user_id='fooobar').first()
-        if p:
-            db.session.delete(p)
-            db.session.commit()
-            db.session.rollback()
-        u = User.query.first()
-        from sqlalchemy.orm import make_transient
-        db.session.expunge(u)
-        make_transient(u)
-        u.id = None
-        u.user_id = 'fooobar'
-        u.update_password('fooobar')
-        u.email = 'foooo@bar.com'
-        db.session.add(u)
-        db.session.commit()
-
         return render_template('register/index.html')
 
     @route('api', methods=['GET', 'POST'])
