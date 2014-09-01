@@ -128,7 +128,10 @@ class EveAPIQuery(object):
 
     def get(self, call, **kwargs):
         from newauth.models import APIKey, db
-        cache_key = hash((self.base, call, frozenset(kwargs)))
+        if self.key_id and self.vcode:
+            cache_key = hash((self.base, call, self.key_id, self.vcode, frozenset(kwargs.items())))
+        else:
+            cache_key = hash((self.base, call, frozenset(kwargs.items())))
         cached_data = redis.get(cache_key)
         if cached_data:
             cached_data = cPickle.loads(cached_data)
