@@ -38,7 +38,6 @@ class APIKey(db.Model):
         except Exception as e:
             current_app.logger.exception(e)
             raise e
-        print(api_info)
         self.mask = api_info.accessMask
         if api_info.expires:
             self.expires_on = api_info.expires

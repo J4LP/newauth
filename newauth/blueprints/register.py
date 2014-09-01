@@ -102,8 +102,8 @@ class RegisterView(FlaskView):
             try:
                 db.session.commit()
             except Exception as e:
-                db.session.rollback()
                 current_app.logger.exception(e)
+                db.session.rollback()
                 flash("Could not save user to database.", "danger")
             else:
                 User.password_updated.send((user, form.password.data))

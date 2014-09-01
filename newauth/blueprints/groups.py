@@ -21,7 +21,6 @@ class GroupsView(FlaskView):
     @route('/new', methods=['POST'])
     @is_admin
     def new_group(self):
-        print('hello')
         new_group_form = GroupCreateForm()
         new_group_form.type.choices = [(element.name, element.value) for element in list(GroupType)]
         if new_group_form.validate_on_submit():
