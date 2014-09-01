@@ -86,15 +86,14 @@ class LDAPDocument(Container):
 class LDAPUser(LDAPDocument):
     objectClass = List()
     dn = String()
-    userPassword = String()
     email = String()
     accountStatus = String()
     alliance = String()
     corporation = String()
     characterName = String()
     authGroup = List()
-    #key_id = Number()
-    #vcode = String()
+    keyId = Number()
+    vCode = String()
 
     LIST_ATTRIBUTES = ('objectClass', 'authGroup',)
 
@@ -111,7 +110,7 @@ class LDAPUser(LDAPDocument):
 
         user.objectClass = ['top', 'account', 'simpleSecurityObject', 'xxPilot']
         user.email = model.email
-        user.accountStatus = model.status
+        user.accountStatus = model.status if model.status else 'Ineligible'
         if model.main_character:
             user.characterName = model.main_character.name
             user.alliance = model.main_character.alliance_name
@@ -120,6 +119,8 @@ class LDAPUser(LDAPDocument):
             user.characterName = ''
             user.alliance = ''
             user.corporation = ''
+        user.keyId = model.main_character.api_key.key_id
+        user.vCode = model.main_character.api_key.vcode
         user.authGroup = [membership.group.name for membership in model.groups.filter_by(is_applying=False)]
         user.dn = 'uid={},{}'.format(model.user_id, current_app.config['SYNC_LDAP_MEMBERDN'])
         return user
@@ -154,11 +155,15 @@ class LDAPUser(LDAPDocument):
             self.characterName = ''
             self.alliance = ''
             self.corporation = ''
+        self.keyId = model.main_character.api_key.key_id
+        self.vCode = model.main_character.api_key.vcode
         self.authGroup = [membership.group.name for membership in model.groups.filter_by(is_applying=False)]
 
     def changes(self):
         ldif_changes = {}
         for key in self.__fields__.iterkeys():
+            if key == 'dn':
+                continue
             value = getattr(self, key)
             if key not in self._original_ldap_attributes:
                 if isinstance(value, list) and value:

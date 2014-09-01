@@ -1,3 +1,5 @@
+import random
+import string
 from ldap3 import Server, Connection, AUTH_SIMPLE, STRATEGY_SYNC, SEARCH_SCOPE_WHOLE_SUBTREE, MODIFY_ADD, MODIFY_DELETE, MODIFY_REPLACE, LDAPException
 from flask import current_app
 from flask.ext.sqlalchemy import models_committed
@@ -78,7 +80,6 @@ class LDAPSync(object):
                 if len(c.response) > 1:
                     raise Exception('Found more than one result for uid {}'.format(user_id))
                 resource = c.response[0]
-                print(resource)
                 return LDAPUser.from_ldap(resource)
 
     def save_user(self, ldap_user):
@@ -90,7 +91,11 @@ class LDAPSync(object):
 
     def insert_user(self, model):
         ldap_user = LDAPUser.from_sql(model)
-        self.save_user(ldap_user)
+        attributes = {k: v for k, v in ldap_user.__dict__['__data__'].iteritems() if v is not None and k != 'dn' and k != 'objectClass' and v}
+        attributes['userPassword'] = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
+        with self.connection as c:
+            c.add(ldap_user.dn, object_class=['top', 'account', 'simpleSecurityObject', 'xxPilot'], attributes=attributes)
+            result = c.result
 
     def update_user(self, model):
         ldap_user = self.get_user(model.user_id)
