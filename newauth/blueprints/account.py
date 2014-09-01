@@ -162,3 +162,8 @@ class AccountView(FlaskView):
                     flash('Your credentials were valid but we could not log you in.', 'danger')
                 return redirect(url_for('AccountView:login'))
         return render_template('account/login.html', form=form)
+
+    def logout(self):
+        session.clear()
+        flash('You have been logged out.', 'info')
+        return redirect(url_for('AccountView:login'))

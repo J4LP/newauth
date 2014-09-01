@@ -11,10 +11,20 @@
         </div>
         <div class="collapse navbar-collapse" id="newauth-nav">
             <ul class="nav navbar-nav">
-                <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-                <li><a href="{{ url_for('AccountView:profile') }}"><i class="fa fa-user"></i> Account</a></li>
-                <li><a href="{{ url_for('GroupsView:index') }}"><i class="fa fa-group"></i> Groups</a></li>
+                {% if current_user.is_authenticated() %}
+                    <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('AccountView:profile') }}"><i class="fa fa-user"></i> Account</a></li>
+                    <li><a href="{{ url_for('GroupsView:index') }}"><i class="fa fa-group"></i> Groups</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('AccountView:login') }}"><i class="fa fa-sign-in"></i> Login</a></li>
+                {% endif %}
             </ul>
+            {% if current_user.is_authenticated() %}
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">{{ current_user.name }}</a></li>
+                <li><a href="{{ url_for('AccountView:logout') }}"><i class="fa fa-sign-out"></i> Logout</a></li>
+            </ul>
+            {% endif %}
         </div>
     </div>
 </nav>
