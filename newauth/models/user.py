@@ -1,4 +1,4 @@
-from passlib.hash import bcrypt
+from passlib.hash import bcrypt, ldap_salted_sha1
 from flask import current_app, flash, abort
 from flask.ext.login import current_user
 from newauth.app import newauth_signals
@@ -41,12 +41,23 @@ class User(db.Model):
 
     def check_password(self, password):
         """Check if given password checks out.
+        If the password is in a LDAP format, it will convert it to
+        bcrypt.
 
         :param password: The password to compare
         :type password: str
         :returns: bool -- If the password checks out or not
 
         """
+        if self.password[0:6] == '{SSHA}':
+            # This is an old LDAP password, let's validate it and upgrade
+            if ldap_salted_sha1.verify(password, self.password):
+                self.password = bcrypt.encrypt(password)
+                db.session.add(self)
+                db.session.commit()
+                return True
+            else:
+                return False
         return bcrypt.verify(password, self.password)
 
     def is_authenticated(self):
@@ -89,8 +100,10 @@ class User(db.Model):
                         account_status = CharacterStatus.ally
                     elif character_status == CharacterStatus.internal:
                         # No need to go further.
-                        self.set_status(CharacterStatus.internal)
-                        return
+                        account_status = CharacterStatus.internal
+                        break
+            if account_status == CharacterStatus.internal:
+                break
         self.set_status(account_status)
         db.session.add(self)
         db.session.commit()

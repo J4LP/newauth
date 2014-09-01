@@ -3,6 +3,7 @@ import string
 from ldap3 import Server, Connection, AUTH_SIMPLE, STRATEGY_SYNC, SEARCH_SCOPE_WHOLE_SUBTREE, MODIFY_ADD, MODIFY_DELETE, MODIFY_REPLACE, LDAPException
 from flask import current_app
 from flask.ext.sqlalchemy import models_committed
+from passlib.hash import ldap_salted_sha1
 from slugify import slugify
 from sqlalchemy.orm import make_transient
 from newauth.models import User, Group, GroupMembership, db, APIKey
@@ -92,7 +93,7 @@ class LDAPSync(object):
     def insert_user(self, model):
         ldap_user = LDAPUser.from_sql(model)
         attributes = {k: v for k, v in ldap_user.__dict__['__data__'].iteritems() if v is not None and k != 'dn' and k != 'objectClass' and v}
-        attributes['userPassword'] = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
+        attributes['userPassword'] = ldap_salted_sha1.encrypt(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24)))
         with self.connection as c:
             c.add(ldap_user.dn, object_class=['top', 'account', 'simpleSecurityObject', 'xxPilot'], attributes=attributes)
             result = c.result
@@ -115,9 +116,9 @@ class LDAPSync(object):
     def update_user_password(self, change):
         ldap_user = self.get_user(change[0].user_id)
         with self.connection as c:
-            c.modify(ldap_user.dn, {'userPassword': [(MODIFY_REPLACE, [change[1]])]})
+            c.modify(ldap_user.dn, {'userPassword': [(MODIFY_REPLACE, [ldap_salted_sha1.encrypt(change[1])])]})
             result = c.result
 
 
-
+ldap_sync = LDAPSync()
 

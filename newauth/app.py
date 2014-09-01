@@ -37,8 +37,8 @@ def create_app():
     app.jinja_env.globals['GroupType'] = GroupType
 
     # Initialize NewAuth plugins
-    from newauth.plugins.sync.ldap import LDAPSync
-    LDAPSync(app)
+    from newauth.plugins.sync.ldap import ldap_sync
+    ldap_sync.init_app(app)
 
     @app.route('/')
     def home():
