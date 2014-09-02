@@ -24,13 +24,13 @@
         <div class="col-md-6">
             <div class="btn-group btn-group-justified">
                 <div class="btn-group">
-                    <button class="btn btn-primary">All groups</button>
+                    <a href="{{ url_for('GroupsView:index', filter='all') }}" class="btn btn-primary">All groups</a>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-success">My groups</button>
+                    <a href="{{ url_for('GroupsView:index', filter='member') }}" class="btn btn-success">My groups</a>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-info">My pending groups</button>
+                    <a href="{{ url_for('GroupsView:index', filter='pending') }}" class="btn btn-info">My pending groups</a>
                 </div>
             </div>
         </div>
@@ -78,6 +78,8 @@
                             <p class="list-group-item-text">{{ group.description }}</p>
                         </a>
                     {% endif %}
+                {% else %}
+                    <div class="list-group-item">There is no groups to display...</div>
                 {% endfor %}
                 {% if current_user.is_admin() %}
                     <a href="#new_group" class="list-group-item" data-toggle="modal" data-target="#new-group"><i class="fa fa-plus fa-fw"></i> New Group</a>
