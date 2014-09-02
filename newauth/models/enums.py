@@ -41,3 +41,9 @@ class GroupType(Enum):
     public = 'Public'
     private = 'Private'
     hidden = 'Hidden'
+
+
+class GroupInviteStatus(Enum):
+    pending = 'Pending'
+    accepted = 'Accepted'
+    rejected = 'Rejected'

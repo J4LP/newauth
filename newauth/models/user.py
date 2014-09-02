@@ -3,7 +3,7 @@ from flask import current_app, flash, abort
 from flask.ext.login import current_user
 from newauth.app import newauth_signals
 from newauth.models import db
-from newauth.models.enums import CharacterStatus, APIKeyStatus
+from newauth.models.enums import CharacterStatus, APIKeyStatus, GroupInviteStatus
 
 
 class User(db.Model):
@@ -149,6 +149,9 @@ class User(db.Model):
         if not admin_group.members.filter_by(user_id=current_user.id, is_admin=True).first():
             return False
         return True
+
+    def has_invite_from(self, group):
+        return True if group.invites.filter_by(recipient_id=self.id, status=GroupInviteStatus.pending.value).first() else False
 
     def __repr__(self):
         return '<User %r>' % self.user_id

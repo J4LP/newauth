@@ -41,12 +41,18 @@
                 <li><i class="fa fa-fw fa-eye"></i> Public group</li>
                 <li><i class="fa fa-fw fa-eye-slash"></i> Hidden group</li>
                 <li><i class="fa fa-fw fa-question"></i> Private group <small>(application needed)</small></li>
+                <li><i class="fa fa-fw fa-exclamation"></i> Invitation <small>(attention needed)</small></li>
             </ul>
         </div>
         <div class="col-md-12">
             <div class="list-group">
                 {% for group in groups %}
-                    {% if group.get_type() == GroupType.hidden and current_user.is_member_of(group) %}
+                    {% if current_user.has_invite_from(group) %}
+                        <a class="list-group-item list-group-item-info js-decide-invitation" href="#" data-group={{ group.id }} data-name="{{ group.name }}">
+                            <h4 class="list-group-item-heading"><i class="fa fa-fw fa-exclamation"></i>{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}<small><span class="label label-success">You have been invited</span></small></h4>
+                            <p class="list-group-item-text">{{ group.description }}</p>
+                        </a>
+                    {% elif group.get_type() == GroupType.hidden and current_user.is_member_of(group) %}
                         <a class="list-group-item list-group-item-success" href="{{ url_for('GroupsView:get', name=group.name) }}">
                             <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
                             <p class="list-group-item-text">{{ group.description }}</p>
@@ -117,6 +123,26 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="decide-invitation">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">You have been invited to <span class="js-group-name"></span></h4>
+                </div>
+                <form action="{{ url_for('GroupsView:decide_invitation') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="modal-body">
+                        <input type="hidden" name="group_id"/>
+                        <p>Do you wish to join the group <span class="js-group-name"></span>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" name="choice" value="no" class="btn btn-danger"><i class="fa fa-fw fa-times"></i> Decline</button>
+                        <button type="submit" name="choice" value="yes" class="btn btn-success"><i class="fa fa-fw fa-check"></i> Accept</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script>
         $(function() {
             $('.js-join-group').on('click', function(e) {
@@ -124,6 +150,12 @@
                 $('input[name=group_id]').val($(this).data('group'))
                 $('#join-group span.js-group-name').text($(this).data('name'))
                 $('#join-group').modal('show')
+            })
+            $('.js-decide-invitation').on('click', function(e) {
+                e.preventDefault()
+                $('input[name=group_id]').val($(this).data('group'))
+                $('#join-group span.js-group-name').text($(this).data('name'))
+                $('#decide-invitation').modal('show')
             })
         })
     </script>

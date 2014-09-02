@@ -14,7 +14,7 @@ from .message import Message
 from .api_key import APIKey
 from .character import Character
 from .auth_contact import AuthContact
-from .group import GroupMembership, Group
+from .group import GroupMembership, Group, GroupInvite
 login_manager.login_view = 'AccountView:login'
 
 @login_manager.user_loader

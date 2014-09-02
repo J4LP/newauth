@@ -40,13 +40,13 @@ class AccountUpdateForm(Form):
 class GroupCreateForm(Form):
     name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
-    public_members = BooleanField('Public member list', default=True, validators=[DataRequired()])
+    public_members = BooleanField('Public member list', default=True)
     type = SelectField('Type', validators=[DataRequired()])
 
 
 class GroupEditForm(Form):
     description = TextAreaField('Description', validators=[DataRequired()])
-    public_members = BooleanField('Public member list', default=True, validators=[DataRequired()])
+    public_members = BooleanField('Public member list', default=True)
     type = SelectField('Type', validators=[DataRequired()])
 
 

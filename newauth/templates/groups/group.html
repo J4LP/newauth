@@ -25,6 +25,8 @@
                         <dt>Members</dt>
                         <dd>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</dd>
                     {% endif %}
+                    <dt>Type</dt>
+                    <dd>{{ group.type }}</dd>
                 </dl>
             </div>
         </div>
@@ -65,55 +67,116 @@
             </div>
         </div>
         {% if membership.is_admin %}
-        <div class="panel panel-turquoise">
-            <div class="panel-heading">
-                <h4 class="panel-title"><a href="#" data-toggle="collapse" data-target="#panel-applications">Applications</a></h4>
+            {% if group.get_type() == GroupType.private %}
+            <div class="panel panel-turquoise">
+                <div class="panel-heading">
+                    <h4 class="panel-title"><a href="#" data-toggle="collapse" data-target="#panel-applications">Applications</a></h4>
+                </div>
+                <table class="table table-responsive collapse in" id="panel-applications">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Corporation</th>
+                            <th>Alliance</th>
+                            <th>Application text</th>
+                            <th>Applied on</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in group.members.filter_by(is_applying=True).all() %}
+                            <tr>
+                                <td>{{ application.user.main_character.name }}</td>
+                                <td>{{ application.user.main_character.corporation_name }}</td>
+                                <td>{{ application.user.main_character.alliance_name }}</td>
+                                <td><a href="#" data-toggle="popover" data-content="{{ application.application_text }}" data-trigger="hover" title="Application text">Hover for application text</a></td>
+                                <td><abbr data-toggle="tooltip" title="{{ application.joined_on|format_datetime }}">{{ application.joined_on|humanize }}</abbr></td >
+                                <td>
+                                    <div class="btn-group pull-right">
+                                        <button class="btn btn-success btn-xs js-accept-application" data-loading-text="Loading..." data-user="{{ application.user.id }}"><i class="fa fa-fw fa-check"></i> Accept</button>
+                                        <button class="btn btn-danger btn-xs js-reject-application" data-loading-text="Loading..." data-user="{{ application.user.id }}"><i class="fa fa-fw fa-times"></i> Reject</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                            <td colspan="6">No applications received.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <table class="table table-responsive collapse in" id="panel-applications">
-                <thead>
-                    <tr>
-                        <th>Character Name</th>
-                        <th>Corporation</th>
-                        <th>Alliance</th>
-                        <th>Application text</th>
-                        <th>Applied on</th>
-                        <th class="text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for application in group.members.filter_by(is_applying=True).all() %}
-                        <tr>
-                            <td>{{ application.user.main_character.name }}</td>
-                            <td>{{ application.user.main_character.corporation_name }}</td>
-                            <td>{{ application.user.main_character.alliance_name }}</td>
-                            <td><a href="#" data-toggle="popover" data-content="{{ application.application_text }}" data-trigger="hover" title="Application text">Hover for application text</a></td>
-                            <td><abbr data-toggle="tooltip" title="{{ application.joined_on|format_datetime }}">{{ application.joined_on|humanize }}</abbr></td >
-                            <td>
-                                <div class="btn-group pull-right">
-                                    <button class="btn btn-success btn-xs js-accept-application" data-loading-text="Loading..." data-user="{{ application.user.id }}"><i class="fa fa-fw fa-check"></i> Accept</button>
-                                    <button class="btn btn-danger btn-xs js-reject-application" data-loading-text="Loading..." data-user="{{ application.user.id }}"><i class="fa fa-fw fa-times"></i> Reject</button>
-                                </div>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                        <td colspan="6">No applications received.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            {% endif %}
+            {% if group.get_type() == GroupType.hidden %}
+                <div class="panel panel-turquoise">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Invitations</h4>
+                    </div>
+                    <div class="panel-body">
+                        <p>Because this group is hidden, you need to invite people you want in. Please start to type the first characters of their Character Name to search.</p>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-3">
+                                <form class="form-horizontal" action="{{ url_for('GroupsView:invite', name=group.name) }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <label for="">User search</label>
+                                            <select class="form-control" name="user_id" id="select_user" placeholder="Find a user..."></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <button type="submit" class="btn btn-block btn-primary"><i class="fa fa-plus fa-fw"></i> Invite</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Corporation</th>
+                                <th>Alliance</th>
+                                <th>Invited on</th>
+                                <th>Invited by</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invite in group.invites %}
+                                <tr>
+                                    <td>{{ invite.recipient.name }}</td>
+                                    <td>{{ invite.recipient.main_character.corporation_name }}</td>
+                                    <td>{{ invite.recipient.main_character.alliance_name }}</td>
+                                    <td><abbr data-toggle="tooltip" title="{{ invite.created_on|format_datetime }}">{{ invite.created_on|humanize }}</abbr></td>
+                                    <td>{{ invite.sender.name }}</td>
+                                    <td class="text-right">
+                                        <button class="btn btn-xs btn-danger js-cancel-invite" data-loading-text="Loading..." data-invite="{{ invite.id }}"><i class="fa fa-fw fa-times"></i> Cancel</button>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6">No invites yet...</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         {% endif %}
         {% if not membership.is_applying %}
         <div class="panel panel-turquoise">
             <div class="panel-heading">
                 <h4 class="panel-title">Member list</h4>
             </div>
-            {% if group.public_members %}
+            {% if group.public_members or membership.is_admin %}
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>Character name</th>
+                        <th>Name</th>
                         <th>Corporation</th>
                         <th>Alliance</th>
                         <th>Joined on</th>
@@ -273,4 +336,43 @@ $(function() {
     $('[data-toggle=popover]').popover('hide');
 })
 </script>
+{% if group.get_type() == GroupType.hidden %}
+    <form id="cancel-invite" action="{{ url_for('GroupsView:cancel_invite', name=group.name) }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="invite_id">
+    </form>
+    <script>
+    $(function() {
+        var cancelInvite = function(e) {
+            $(this).button('loading')
+            $('#cancel-invite input[name=invite_id]').val($(this).data('invite'))
+            $('#cancel-invite').submit()
+        }
+        $('.js-cancel-invite').on('click', cancelInvite)
+        $('select#select_user').selectize({
+            valueField: 'id',
+            labelField: 'name',
+            searchField: 'name',
+            options: [],
+            load: function(query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '{{ url_for('GroupsView:search_users', name=group.name) }}',
+                    type: 'GET',
+                    data: {
+                        name: query
+                    },
+                    error: function() {
+                        callback();
+                    },
+                    success: function(res) {
+                        console.log(res)
+                        callback(res.results);
+                    }
+                })
+            }
+        })
+    })
+    </script>
+{% endif %}
 {% endblock %}

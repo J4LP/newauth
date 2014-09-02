@@ -1,5 +1,6 @@
+from newauth.app import newauth_signals
 from newauth.models import db
-from newauth.models.enums import GroupType
+from newauth.models.enums import GroupType, GroupInviteStatus
 
 
 class GroupMembership(db.Model):
@@ -36,3 +37,27 @@ class Group(db.Model):
 
     def set_type(self, type):
         self.type = type.value
+
+
+class GroupInvite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    status = db.Column(db.Enum(
+        *[element.value for key, element in GroupInviteStatus.__members__.items()], name='GroupInviteStatus'
+    ), nullable=False, default='Pending')
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now())
+
+    group = db.relationship('Group', backref=db.backref('invites', lazy='dynamic'), foreign_keys=[group_id])
+    sender = db.relationship('User', backref=db.backref('sent_invites', lazy='dynamic'), foreign_keys=[sender_id])
+    recipient = db.relationship('User', backref=db.backref('received_invites', lazy='dynamic'), foreign_keys=[recipient_id])
+
+    new_invite = newauth_signals.signal('new-group-invite')
+
+    def get_status(self):
+        return GroupInviteStatus(self.status)
+
+    def set_status(self, status):
+        self.status = status.value
