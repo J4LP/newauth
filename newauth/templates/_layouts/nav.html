@@ -12,7 +12,7 @@
         <div class="collapse navbar-collapse" id="newauth-nav">
             <ul class="nav navbar-nav">
                 {% if current_user.is_authenticated() %}
-                    <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('AccountView:index') }}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
                     <li><a href="{{ url_for('AccountView:profile') }}"><i class="fa fa-user"></i> Account</a></li>
                     <li><a href="{{ url_for('GroupsView:index') }}"><i class="fa fa-group"></i> Groups</a></li>
                 {% else %}
