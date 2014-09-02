@@ -46,18 +46,32 @@
         <div class="col-md-12">
             <div class="list-group">
                 {% for group in groups %}
-                    {% if current_user.has_applied_to(group) %}
+                    {% if group.get_type() == GroupType.hidden and current_user.is_member_of(group) %}
+                        <a class="list-group-item list-group-item-success" href="{{ url_for('GroupsView:get', name=group.name) }}">
+                            <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
+                            <p class="list-group-item-text">{{ group.description }}</p>
+                        </a>
+                    {% elif current_user.has_applied_to(group) %}
                         <a class="list-group-item list-group-item-info" href="{{ url_for('GroupsView:get', name=group.name) }}">
+                            <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
+                            <p class="list-group-item-text">{{ group.description }}</p>
+                        </a>
                     {% elif current_user.is_member_of(group) %}
                         <a class="list-group-item list-group-item-success" href="{{ url_for('GroupsView:get', name=group.name) }}">
+                            <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
+                            <p class="list-group-item-text">{{ group.description }}</p>
+                        </a>
                     {% elif group.get_type() == GroupType.private %}
                         <a class="list-group-item" href="{{ url_for('GroupsView:apply', name=group.name) }}">
-                    {% else %}
+                            <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
+                            <p class="list-group-item-text">{{ group.description }}</p>
+                        </a>
+                    {% elif group.get_type() != GroupType.hidden %}
                         <a class="list-group-item js-join-group" href="#" data-group={{ group.id }} data-name="{{ group.name }}">
+                            <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
+                            <p class="list-group-item-text">{{ group.description }}</p>
+                        </a>
                     {% endif %}
-                <h4 class="list-group-item-heading">{{ group_icon(group) }}{{ group.name }} {% if group.public_members %}<small>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</small>{% endif %}</h4>
-                <p class="list-group-item-text">{{ group.description }}</p>
-                </a>
                 {% endfor %}
                 {% if current_user.is_admin() %}
                     <a href="#new_group" class="list-group-item" data-toggle="modal" data-target="#new-group"><i class="fa fa-plus fa-fw"></i> New Group</a>
