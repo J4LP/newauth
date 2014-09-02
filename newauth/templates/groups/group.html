@@ -2,6 +2,8 @@
 
 {% import 'macros.html' as macros %}
 
+{% block title %}Group {{ group.name }} | {{ config.EVE.auth_name }}{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-md-12">
