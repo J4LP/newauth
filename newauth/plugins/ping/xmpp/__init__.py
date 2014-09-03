@@ -73,7 +73,7 @@ class XMPPPinger(Pinger):
             import logging
             logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
             sleekxmpp.ClientXMPP.__init__(self, jid, password)
-            self.connect(address=(config['host'], 5222), reattempt=False)
+            self.connect(reattempt=False)
             self.add_event_handler('session_start', self.send_ping)
             self.process()
             self.disconnect(wait=True)
