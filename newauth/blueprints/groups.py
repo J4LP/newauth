@@ -122,6 +122,7 @@ class GroupsView(FlaskView):
                 joined_on=datetime.datetime.utcnow()
             )
             db.session.add(membership)
+            db.session.delete(invitation)
             db.session.commit()
             flash("You have joined the group '{}'".format(group.name), 'success')
         if choice == 'no':
@@ -129,8 +130,6 @@ class GroupsView(FlaskView):
             db.session.commit()
             flash("You have declined the invitation to join the group '{}'".format(group.name), 'info')
         return redirect(url_for('GroupsView:index'))
-
-
 
     @route('/<name>/apply', methods=['GET', 'POST'])
     def apply(self, name):
