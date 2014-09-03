@@ -41,9 +41,9 @@ class Group(db.Model):
 
 class GroupInvite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     status = db.Column(db.Enum(
         *[element.value for key, element in GroupInviteStatus.__members__.items()], name='GroupInviteStatus'
     ), nullable=False, default='Pending')
