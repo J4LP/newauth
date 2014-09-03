@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import IntegerField, StringField, PasswordField, ValidationError, SelectField, TextAreaField, BooleanField
+from wtforms import IntegerField, StringField, PasswordField, ValidationError, SelectField, TextAreaField, BooleanField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from newauth.models import User
 
@@ -52,3 +52,11 @@ class GroupEditForm(Form):
 
 class GroupApplicationForm(Form):
     application_text = TextAreaField('Application Text', validators=[DataRequired()])
+
+
+class PingForm(Form):
+    category = HiddenField('Category', validators=[DataRequired(message='You must select a category')])
+    message = TextAreaField('Message', validators=[DataRequired()])
+    internal = BooleanField('Internal', default=False)
+    ally = BooleanField('Ally', default=False)
+    recipients = StringField('Recipients')

@@ -22,18 +22,20 @@ def create_app():
     redis.init_app(app)
     login_manager.init_app(app)
 
-    from newauth.blueprints import AccountView, RegisterView, GroupsView
+    from newauth.blueprints import AccountView, RegisterView, GroupsView, PingsView
     AccountView.register(app)
     RegisterView.register(app)
     GroupsView.register(app)
+    PingsView.register(app)
 
     from newauth.assets import assets_env
     assets_env.init_app(app)
 
-    from newauth.utils import humanize, format_datetime, pluralize
+    from newauth.utils import humanize, format_datetime, pluralize, markdown_filter
     app.jinja_env.filters['humanize'] = humanize
     app.jinja_env.filters['format_datetime'] = format_datetime
     app.jinja_env.filters['pluralize'] = pluralize
+    app.jinja_env.filters['markdown'] = markdown_filter
     app.jinja_env.globals['GroupType'] = GroupType
 
     # Initialize NewAuth plugins

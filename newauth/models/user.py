@@ -134,6 +134,9 @@ class User(db.Model):
     def is_admin_of(self, group):
         return True if group.members.filter_by(user_id=self.id, is_admin=True).first() else False
 
+    def can_ping(self, group):
+        return True if group.members.filter_by(user_id=self.id, can_ping=True).first() else False
+
     def has_applied_to(self, group):
         membership = group.members.filter_by(user_id=self.id).first()
         if membership:

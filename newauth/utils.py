@@ -2,6 +2,7 @@ from functools import wraps
 import arrow
 from flask import flash, current_app, abort
 from flask.ext.login import current_user
+from markdown import Markdown
 from newauth.models import Group
 
 
@@ -45,3 +46,8 @@ def is_admin(f):
             abort(403)
         return f(*args, **kwargs)
     return decorated_function
+
+
+def markdown_filter(content):
+    md = Markdown(safe_mode='escape')
+    return md.convert(content)

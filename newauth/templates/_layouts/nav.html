@@ -15,6 +15,14 @@
                     <li><a href="{{ url_for('AccountView:index') }}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
                     <li><a href="{{ url_for('AccountView:profile') }}"><i class="fa fa-user"></i> Account</a></li>
                     <li><a href="{{ url_for('GroupsView:index') }}"><i class="fa fa-group"></i> Groups</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> Pings <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('PingsView:history') }}"><i class="fa fa-calendar-o"></i> History</a></li>
+                            <li><a href="{{ url_for('PingsView:new') }}"><i class="fa fa-plus"></i> Send ping</a></li>
+                            <li><a href="{{ url_for('PingsView:settings') }}"><i class="fa fa-cog"></i> Settings</a></li>
+                        </ul>
+                    </li>
                 {% else %}
                     <li><a href="{{ url_for('AccountView:login') }}"><i class="fa fa-sign-in"></i> Login</a></li>
                 {% endif %}

@@ -1,0 +1,50 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Ping settings | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="ping-settings row">
+    <div class="col-md-12">
+        <div class="alert alert-warning"><i class="fa fa-warning"></i> Pings can be sent any day, any hour. Make sure to configure your device properly so it does not wake you up in the middle of the night.</div>
+        <h1><i class="fa fa-fw fa-cog"></i> Ping settings</h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        {% for pinger in pingers %}
+        <div class="panel panel-turquoise">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ pinger.display_name }}</h3>
+            </div>
+            <div class="panel-body">
+                <p>{{ pinger.description|markdown|safe }}</p>
+                <form class="form-horizontal" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="pinger_name" value="{{ pinger.name }}">
+                    {% for setting in pinger.configuration %}
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" for="{{ setting[0] }}">{{ setting[1] }}</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="{{ setting[0] }}">
+                                <span class="help-block">{{ setting[2]|markdown|safe }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </form>
+            </div>
+            <div class="panel-footer clearfix">
+                {% if pinger.immutable %}
+                <div class="btn-group pull-right">
+                    <button class="btn btn-danger"><i class="fa fa-fw fa-times"></i> Disable</button>
+                    <button class="btn btn-success"><i class="fa fa-fw fa-check"></i> Enable</button>
+                </div>
+                {% else %}
+                <span class="pull-right text-muted">This pinger cannot be disabled.</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
