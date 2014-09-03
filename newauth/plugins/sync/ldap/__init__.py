@@ -62,13 +62,6 @@ class LDAPSync(object):
                     self.update_user(model)
                 if change == 'delete':
                     self.delete_user(model)
-            if isinstance(model, Group):
-                if change == 'insert':
-                    pass
-                if change == 'update':
-                    self.update_group(model)
-                if change == 'delete':
-                    self.delete_group(model)
             if isinstance(model, GroupMembership):
                 self.update_membership(model)
 
