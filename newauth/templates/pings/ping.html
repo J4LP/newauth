@@ -1,0 +1,44 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Ping history | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="ping-history row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-fw fa-info-circle"></i> Ping details <a class="btn btn-primary pull-right" href="{{ url_for('PingsView:history') }}"><i class="fa fa-fw fa-reply"></i> Back</a></h1>
+        <hr/>
+    </div>
+    <div class="col-md-6">
+        <div class="well">
+            {{ ping.text.replace('\n', '<br>')|safe }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <dl class="dl-horizontal">
+            <dt>Sent by</dt>
+            <dd>{{ ping.sender.name }}</dd>
+            <dt>Sent at</dt>
+            <dd>{{ ping.created_on|format_datetime }} <small>{{ ping.created_on|humanize }}</small></dd>
+            <dt>Sent to scopes</dt>
+            <dd>{{ ping.scope }}</dd>
+            <dt>Sent to contacts</dt>
+            {% if ping.contacts %}
+                <dd>{{ ping.contacts|join(', ', 'name') }}</dd>
+            {% else %}
+                <dd>No contacts</dd>
+            {% endif %}
+            <dt>Sent to groups</dt>
+            {% if ping.groups %}
+                <dd>{{ ping.groups|join(', ', 'name') }}</dd>
+            {% else %}
+                <dd>No groups</dd>
+            {% endif %}
+            <dt>Sent to</dt>
+            <dd>{{ ping.users.count() }} {{ 'members'|pluralize(ping.users.count()) }}</dd>
+
+        </dl>
+    </div>
+</div>
+{% endblock %}

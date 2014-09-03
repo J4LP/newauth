@@ -1,0 +1,98 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}New ping | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="ping-history row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-fw fa-envelope-o"></i> New ping</h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        <form class="form-horizontal" action="{{ url_for('PingsView:new') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="category"/>
+            <div class="panel panel-turquoise">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Category</h3>
+                </div>
+                <div class="list-group">
+                    {% for category in categories %}
+                        <a class="list-group-item js-pick-category" href="#" data-category="{{ category.id }}"><i class="fa {{ category.icon }}"></i> {{ category.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="panel panel-turquoise">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Message</h3>
+                </div>
+                <textarea class="form-control" id="message" name="message" placeholder="Write message here" rows="10"></textarea>
+            </div>
+            <div class="panel panel-turquoise">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Filtering</h3>
+                </div>
+                <div class="panel-body">
+                    <p>Who do you wish to send this ping to? Start to type a group name or a corporation or an alliance.</p>
+                    <div class="form-group">
+                        {% if current_user.is_admin() %}
+                        <div class="col-sm-12">
+                            <label for="">Scopes</label>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="internal"> Internal
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="internal"> Allies
+                                </label>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="col-sm-12">
+                            <br/>
+                            <label for="">Search</label>
+                            <input type="text" class="form-control" name="recipients" id="recipients" placeholder="Find something..."></type>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-success"><i class="fa fa-envelope"></i> Send ping</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+    <script>
+    $(function() {
+        $('.js-pick-category').on('click', function (e) {
+            e.preventDefault();
+            $('input[name=category]').val($(this).data('category'))
+            $('.js-pick-category').removeClass('active')
+            $(this).addClass('active')
+        })
+        $('input#recipients').selectize({
+            valueField: 'id',
+            labelField: 'name',
+            searchField: 'name',
+            options: [],
+            load: function(query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '{{ url_for('PingsView:search_recipients') }}',
+                    type: 'GET',
+                    data: {
+                        name: query
+                    },
+                    error: function() {
+                        callback();
+                    },
+                    success: function(res) {
+                        console.log(res)
+                        callback(res.results);
+                    }
+                })
+            }
+        })
+    })
+    </script>
+{% endblock %}

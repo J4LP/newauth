@@ -15,6 +15,7 @@ from .api_key import APIKey
 from .character import Character
 from .auth_contact import AuthContact
 from .group import GroupMembership, Group, GroupInvite
+from .ping import Ping, PingCategory, PingerConfiguration
 login_manager.login_view = 'AccountView:login'
 
 @login_manager.user_loader

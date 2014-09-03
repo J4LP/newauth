@@ -1,0 +1,44 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Ping history | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="ping-history row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-fw fa-calendar-o"></i> Ping history</h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Sender</th>
+                    <th>To</th>
+                    <th>Reached</th>
+                    <th>At</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ping in pings %}
+                    <tr>
+                        <td><i class="fa fa-fw {{ ping.category.icon }}"></i> {{ ping.category.name }}</td>
+                        <td>{{ ping.sender.name }}</td>
+                        <td>{{ ping.recipients }}</td>
+                        <td>{{ ping.users.count()}} {{ 'member'|pluralize(ping.users.count()) }}</td>
+                        <td>{{ ping.created_on|format_datetime }} <small>{{ ping.created_on|humanize }}</small></td>
+                        <td class="text-right"><a class="btn btn-info btn-xs" href="{{ url_for('PingsView:ping', ping_id=ping.id) }}"><i class="fa fa-fw fa-info"></i> View</a></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">No pings found...</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
