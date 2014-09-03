@@ -93,8 +93,11 @@ class PingsView(FlaskView):
                     else:
                         ping_users = contacts_users
                 else:
-                    flash("Empty results. Nobody would receive this ping.", 'danger')
-                    return redirect(url_for('PingsView:new'))
+                    if groups_users:
+                        ping_users = groups_users
+                    else:
+                        flash("Empty results. Nobody would receive this ping.", 'danger')
+                        return redirect(url_for('PingsView:new'))
 
             ping_message = ping_form.message.data + '\n' + '== broadcast at {d} (UTC/EVE) from {u} to {r} =='
             recipients = ', '.join(scopes + [group.name for group in groups] + [contact.name for contact in contacts])
