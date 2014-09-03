@@ -11,6 +11,7 @@ from newauth.utils import flash_errors
 
 class AccountView(FlaskView):
 
+    @login_required
     def index(self):
         return render_template('account/index.html')
 
@@ -49,6 +50,7 @@ class AccountView(FlaskView):
         return render_template('account/profile.html', account_form=account_form, api_forms=api_forms, new_api_form=new_api_form)
 
     @route('update_api', methods=['POST'])
+    @login_required
     def update_api(self):
         try:
             current_user.update_keys()
@@ -63,6 +65,7 @@ class AccountView(FlaskView):
         return redirect(url_for('AccountView:profile'))
 
     @route('new_api', methods=['POST'])
+    @login_required
     def new_api(self):
         form = APIKeyForm()
         if form.validate_on_submit():
@@ -94,6 +97,7 @@ class AccountView(FlaskView):
         return redirect(url_for('AccountView:profile'))
 
     @route('update_api/<int:key_id>', methods=['POST'])
+    @login_required
     def edit_api(self, key_id):
         form = APIKeyForm()
         if form.validate_on_submit():
@@ -122,6 +126,7 @@ class AccountView(FlaskView):
         return redirect(url_for('AccountView:profile'))
 
     @route('delete_api/<int:key_id>', methods=['POST'])
+    @login_required
     def delete_api(self, key_id):
         api_key = current_user.api_keys.filter_by(key_id=key_id).first()
         if not api_key:
