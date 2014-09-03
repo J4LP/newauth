@@ -9,7 +9,7 @@ class XMPPPinger(Pinger):
     """
     Jabber pinger. Make sure to configure your offline messages settings if you don't want your server to explode.
 
-    You will need to install sleekxmpp and dnspython.
+    You will need to install sleekxmpp and dnspython and modify your settings file.
 
     Configuration:
 
@@ -21,15 +21,28 @@ class XMPPPinger(Pinger):
     username  Username of user allowed to announce
     password  Password of user allowed to announce
     ========= =============================================
+
+    Example:
+
+    ```
+    PINGERS_SETTINGS = {
+        'newauth.XMPPPinger': {
+            'host': 'example.com',
+            'user': 'admin',
+            'password': 'admin',
+            'user_id_key': 'user_id'
+        }
+    }
+    ```
     """
 
-    name = "newauth.XMPPPInger"
+    name = "newauth.XMPPPinger"
 
     display_name = "Jabber"
 
     def __init__(self, ping=None):
         self.ping = ping
-        self.config = current_app.config['PINGERS_SETTINGS']['XMPPPinger']
+        self.config = current_app.config['PINGERS_SETTINGS']['newauth.XMPPPinger']
         self.immutable = self.config.get('immutable', False)
 
     @property

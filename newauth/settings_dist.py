@@ -36,7 +36,17 @@ class BaseConfig(object):
         'keys': [(0, '')]
     }
 
+    #: The admin group
     ADMIN_GROUP = 'Admin'
+
+    #: The ping group
+    PING_GROUP = 'Ping'
+
+    #: Array of pings to load and use
+    PINGERS = []
+
+    #: Runtime configuration for pingers
+    PINGERS_SETTINGS = {}
 
 
 class DevConfig(BaseConfig):
