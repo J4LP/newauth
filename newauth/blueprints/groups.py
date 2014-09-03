@@ -48,7 +48,7 @@ class GroupsView(FlaskView):
         if not group:
             abort(404)
         membership = group.members.filter_by(user_id=current_user.id).first()
-        if not membership:
+        if not membership and not current_user.is_admin():
             flash('You are not a member of this group.', 'danger')
             return redirect(url_for('GroupsView:index'))
         group_edit_form = GroupEditForm(obj=group)
@@ -81,6 +81,23 @@ class GroupsView(FlaskView):
         flash("You have joined the group '{}'".format(group.name), 'success')
         return redirect(url_for('GroupsView:get', name=group.name))
 
+
+    @route('/join/<name>', methods=['GET'])
+    def admin_join(self, name):
+        group = Group.query.filter_by(name=name).first()
+        if not group:
+            abort(404)
+        if not current_user.is_admin():
+            abort(403)
+        if group.members.filter_by(user_id=current_user.id).first():
+            abort(400)
+        membership = GroupMembership(user=current_user, group=group)
+        membership.joined_on = datetime.datetime.utcnow()
+        db.session.add(membership)
+        db.session.commit()
+        flash("You have joined the group '{}'".format(group.name), 'success')
+        return redirect(url_for('GroupsView:get', name=group.name))
+
     @route('/invitation', methods=['POST'])
     def decide_invitation(self):
         group_id = request.form.get('group_id')
@@ -89,9 +106,9 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(id=group_id).first()
         if not group:
             abort(404)
-        #membership = group.members.filter_by(user=current_user).first()
-        #if membership:
-        #    abort(400)
+        membership = group.members.filter_by(user=current_user).first()
+        if membership:
+            abort(400)
         invitation = group.invites.filter_by(recipient=current_user).first()
         if not invitation or invitation.get_status() != GroupInviteStatus.pending:
             abort(400)
@@ -176,24 +193,13 @@ class GroupsView(FlaskView):
         flash("Your membership to the group '{}' has been removed.".format(group.name), 'success')
         return redirect(url_for('GroupsView:index'))
 
-    def admin(self, name):
-        group = Group.query.filter_by(name=name).first()
-        if not group:
-            abort(404)
-        membership = group.members.filter_by(user_id=current_user.id).first()
-        if not membership or membership.is_applying:
-            flash('You are not a member of this group.', 'error')
-            return redirect(url_for('GroupsView:index'))
-        group_edit_form = GroupEditForm(obj=group)
-        return render_template('groups/admin.html', group=group, group_edit_form=group_edit_form)
-
     @route('/<name>/admin/accept_application', methods=['POST'])
     def accept_application(self, name):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        #if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
-        #    abort(403)
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
+            abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
             abort(400)
@@ -213,8 +219,8 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        #if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
-        #    abort(403)
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
+            abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
             abort(400)
@@ -232,7 +238,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
@@ -251,7 +257,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
@@ -270,7 +276,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
@@ -289,7 +295,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
@@ -308,7 +314,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
@@ -327,7 +333,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         user_id = request.form.get('user_id')
         if not user_id:
@@ -354,7 +360,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         invite_id = request.form.get('invite_id')
         if not invite_id:
@@ -373,7 +379,7 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() or not current_user.is_admin():
             abort(403)
         name = request.args.get('name')
         if not name or len(name) < 3:

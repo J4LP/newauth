@@ -11,6 +11,13 @@
         <hr/>
     </div>
     <div class="col-md-12">
+        {% if current_user.is_admin() and not membership %}
+        <div class="alert alert-info">You are in admin mode. You can anything a group admin could do. If you wish to join this group, click
+                    <a href="{{ url_for('GroupsView:admin_join', name=group.name) }}">here</a>.</div>
+        {% elif current_user.is_admin() and membership %}
+        <div class="alert alert-info">You are in admin mode. You can anything a group admin could do.</div>
+        {% endif %}
+
         <div class="panel panel-turquoise">
             <div class="panel-heading">
                 <h4 class="panel-title">Group information</h4>
@@ -32,6 +39,7 @@
         </div>
     </div>
     <div class="col-md-12">
+        {% if membership %}
         <div class="panel panel-turquoise">
             <div class="panel-heading">
                 <h4 class="panel-title"><a href="#" data-toggle="collapse" data-target="#panel-membership">Your membership</a></h4>
@@ -66,7 +74,8 @@
                 {% endif %}
             </div>
         </div>
-        {% if membership.is_admin %}
+        {% endif %}
+        {% if membership.is_admin or current_user.is_admin() %}
             {% if group.get_type() == GroupType.private %}
             <div class="panel panel-turquoise">
                 <div class="panel-heading">
@@ -172,7 +181,7 @@
             <div class="panel-heading">
                 <h4 class="panel-title">Member list</h4>
             </div>
-            {% if group.public_members or membership.is_admin %}
+            {% if group.public_members or membership.is_admin or current_user.is_admin() %}
                 <table class="table">
                     <thead>
                     <tr>
@@ -180,7 +189,7 @@
                         <th>Corporation</th>
                         <th>Alliance</th>
                         <th>Joined on</th>
-                        {% if membership.is_admin %}
+                        {% if membership.is_admin or current_user.is_admin() %}
                             <th class="text-right">Actions</th>
                         {% endif %}
                     </tr>
@@ -194,7 +203,7 @@
                             <td><abbr data-toggle="tooltip"
                                       title="{{ member.joined_on|format_datetime }}">{{ member.joined_on|humanize }}</abbr>
                             </td>
-                            {% if membership.is_admin %}
+                            {% if membership.is_admin or current_user.is_admin() %}
                                 <td class="text-right">
                                     <div class="btn-group">
                                         {% if member.is_admin %}
@@ -212,6 +221,10 @@
                                 </td>
                             {% endif %}
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">No members</td>
+                        </tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -225,7 +238,7 @@
         {% endif %}
     </div>
 </div>
-{% if membership.is_admin %}
+{% if membership.is_admin or current_user.is_admin() %}
 <div class="modal fade" id="edit-group">
     <div class="modal-dialog">
         <div class="modal-content">
