@@ -76,7 +76,6 @@ class XMPPPinger(Pinger):
             self.connect(reattempt=False)
             self.add_event_handler('session_start', self.send_ping)
             self.process()
-            self.disconnect(wait=True)
 
         def send_ping(self, event):
             for user in self.users:
