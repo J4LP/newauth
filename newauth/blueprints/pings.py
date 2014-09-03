@@ -75,7 +75,7 @@ class PingsView(FlaskView):
                     characters = Character.query.filter((Character.corporation_id==contact.id) | (Character.alliance_id==contact.id)).all()
                     contacts_users |= set(character.owner for character in characters)
                 else:
-                    flash("You are not allowed to ping to group '{}'".format(group.name))
+                    flash("You are not allowed to ping to contact '{}'".format(contact.name))
                     return redirect(url_for('PingsView:new'))
 
             if scopes_users:
