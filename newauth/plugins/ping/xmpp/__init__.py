@@ -54,22 +54,22 @@ class XMPPPinger(Pinger):
 """.format(config=self.config, current_user=current_user)
 
     def send_ping(self):
-        print(self.ping)
 
-        def do_ping(ping, config):
-            self.AnnounceBot(config['user'] + '@' + config['host'], config['password'], config, ping)
+        def do_ping(ping, config, users):
+            self.AnnounceBot(config['user'] + '@' + config['host'], config['password'], config, ping, users)
 
         executor = futures.ThreadPoolExecutor(max_workers=1)
-        executor.submit(do_ping, self.ping, self.config)
+        executor.submit(do_ping, self.ping, self.config, self.ping.users.all())
         executor.shutdown(wait=True)
 
     def enabled(self, user):
         return True
 
     class AnnounceBot(sleekxmpp.ClientXMPP):
-        def __init__(self, jid, password, config, ping):
+        def __init__(self, jid, password, config, ping, users):
             self.ping = ping
             self.config = config
+            self.users = users
             import logging
             logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
             sleekxmpp.ClientXMPP.__init__(self, jid, password)
@@ -79,6 +79,6 @@ class XMPPPinger(Pinger):
             self.disconnect(wait=True)
 
         def send_ping(self, event):
-            for user in self.ping.users.all():
+            for user in self.users:
                 self.send_message(mto=getattr(user, self.config['user_id_key']) + '@' + self.config['host'], mbody=self.ping.text, mtype='chat')
             self.disconnect(wait=True)
