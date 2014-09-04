@@ -13,7 +13,7 @@ class PingsView(FlaskView):
     decorators = [login_required]
 
     def history(self):
-        pings = current_user.pings_received.all()
+        pings = current_user.pings_received.order_by(db.desc(Ping.created_on)).all()
         return render_template('pings/history.html', pings=pings)
 
     @route('new/', methods=['GET', 'POST'])
