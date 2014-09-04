@@ -32,7 +32,7 @@ class AccountUpdateForm(Form):
     user_id = StringField('User ID', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     main_character = SelectField('Main Character', coerce=int, validators=[DataRequired()])
-    password = PasswordField('Current Password', validators=[])
+    password = PasswordField('Cur. Password', validators=[])
     new_password = PasswordField('New Password', validators=[EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm New')
 

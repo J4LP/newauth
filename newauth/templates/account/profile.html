@@ -34,11 +34,11 @@
             </div>
         </div>
         <div class="col-md-6">
-            {{ macros.render_field(account_form.password, placeholder='Current Password', horizontal=True, label_class='col-sm-4', input_class='col-sm-8') }}
-            {{ macros.render_field(account_form.new_password, placeholder='New Password', horizontal=True, label_class='col-sm-4', input_class='col-sm-8') }}
-            {{ macros.render_field(account_form.confirm, placeholder='Confirm New Password', horizontal=True, label_class='col-sm-4', input_class='col-sm-8') }}
+            {{ macros.render_field(account_form.password, placeholder='Current Password', horizontal=True) }}
+            {{ macros.render_field(account_form.new_password, placeholder='New Password', horizontal=True) }}
+            {{ macros.render_field(account_form.confirm, placeholder='Confirm New Password', horizontal=True) }}
             <div class="form-group">
-                <div class="col-sm-8 col-sm-offset-4">
+                <div class="col-sm-9 col-sm-offset-3">
                     <button type="submit" class="btn btn-block btn-success"><i class="fa fa-save fa-fw"></i> Change password</button>
                 </div>
             </div>
