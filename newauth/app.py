@@ -16,7 +16,7 @@ def create_app():
     app.config.from_object('newauth.settings.{}Config'.format(app.environment))
 
     from newauth.models import db, migrate, Message, redis, login_manager
-    from newauth.models.enums import CharacterStatus, GroupType
+    from newauth.models.enums import CharacterStatus, GroupType, APIKeyStatus
     db.init_app(app)
     migrate.init_app(app, db)
     redis.init_app(app)
@@ -51,7 +51,8 @@ def create_app():
         return {
             'Message': Message,
             'CharacterStatus': CharacterStatus,
-            'GroupType': GroupType
+            'GroupType': GroupType,
+            'APIKeyStatus': APIKeyStatus
         }
 
     return app

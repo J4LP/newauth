@@ -53,9 +53,14 @@
         {% for api_key in current_user.api_keys %}
             <div class="panel panel-turquoise">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Key #{{ api_key.key_id }}</h3>
+                    <h3 class="panel-title">Key #{{ api_key.key_id }} - {{ api_key.get_auth_type().capitalize() }}</h3>
                 </div>
                 <div class="panel-body">
+                    {% if api_key.get_status() == APIKeyStatus.invalid_mask %}
+                        <div class="alert alert-danger">This API Key does not have a valid mask.</div>
+                    {% elif api_key.get_status() == APIKeyStatus.invalid_expiration %}
+                        <div class="alert alert-danger">This API Key has an expiration date where it should not.</div>
+                    {% endif %}
                     <div class="row">
                         {% for character in api_key.characters.order_by('id').all() %}
                             <div class="col-md-4">
@@ -142,6 +147,13 @@
                         <div class="alert alert-warning">This will trigger a refresh of your account. Your access to
                             services might be disabled as a result.
                         </div>
+                        <p>Here's the API keys we are accepting:</p>
+                        <ul>
+                            {% for name, requirement in config.EVE.requirements.iteritems() %}
+                                <li><a target="_blank" href="https://support.eveonline.com/api/key/CreatePredefined/{{ requirement.mask }}">{{ name.capitalize() }}</a>: Mask {{ requirement.mask }}, Expires: {{ requirement.expires }}</li>
+                            {% endfor %}
+                        </ul>
+                        <hr/>
                         {{ macros.render_field(new_api_form.key_id, placeholder='KeyID', horizontal=True) }}
                         {{ macros.render_field(new_api_form.vcode, placeholder='vCode', horizontal=True) }}
                     </div>

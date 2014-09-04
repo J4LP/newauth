@@ -21,7 +21,7 @@
             <p>Who are you?</p>
             <a class="btn btn-block btn-success btn-lg" href="{{ url_for('RegisterView:api', type='internal') }}"><i class="fa fa-users"></i> I'm in {{ config.EVE.auth_name }} at this very moment</a>
             <a class="btn btn-block btn-primary btn-lg" href="#"><i class="fa fa-child"></i> I have been accepted to {{ config.EVE.auth_name }}</a>
-            <a class="btn btn-block btn-info btn-lg" href="#"><i class="fa fa-support"></i> I am an ally of {{ config.EVE.auth_name }}</a>
+            <a class="btn btn-block btn-info btn-lg" href="{{ url_for('RegisterView:api', type='ally') }}"><i class="fa fa-support"></i> I am an ally of {{ config.EVE.auth_name }}</a>
         </div>
 
     </div>

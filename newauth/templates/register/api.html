@@ -21,7 +21,10 @@
             {% if registration_type == 'internal' %}
                 <p>Are you already a member of {{ config.EVE.auth_name }}?</p>
                 <p>If so, please click on the following link to create a new API Key from Eve Online's website:</p>
-                <a href=""><h3 class="register-api-link">CLICK HERE TO GENERATE AN API, CHECK NO EXPIRY, NAME IT, TOUCH NOTHING ELSE AND HIT SUBMIT</h3></a>
+                <a target="_blank" href="https://support.eveonline.com/api/key/CreatePredefined/{{ config.EVE.requirements[registration_type].mask }}"><h3 class="register-api-link">CLICK HERE TO GENERATE AN API, CHECK NO EXPIRY, NAME IT, TOUCH NOTHING ELSE AND HIT SUBMIT</h3></a>
+            {% elif registration_type == 'ally' %}
+                <p>Are you an ally of {{ config.EVE.auth_name }}?</p>
+                <a target="_blank" href="https://support.eveonline.com/api/key/CreatePredefined/{{ config.EVE.requirements[registration_type].mask }}"><h3 class="register-api-link">CLICK HERE TO GENERATE AN API, WITH AN EXPIRY DATE, NAME IT, TOUCH NOTHING ELSE AND HIT SUBMIT</h3></a>
             {% endif %}
             {% call macros.render_form(form, action_url=url_for('RegisterView:api', type=registration_type), action_text='Continue', class_='register-member-form', btn_class='btn btn-block btn-success') %}
                 {{ macros.render_field(form.key_id, label_visible=False, placeholder='Key ID') }}

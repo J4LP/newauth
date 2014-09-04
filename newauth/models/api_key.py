@@ -86,3 +86,7 @@ class APIKey(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def get_auth_type(self):
+        for name, requirement in current_app.config['EVE']['requirements'].iteritems():
+            if self.mask == requirement['mask']:
+                return name
