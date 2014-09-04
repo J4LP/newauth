@@ -22,11 +22,12 @@ def create_app():
     redis.init_app(app)
     login_manager.init_app(app)
 
-    from newauth.blueprints import AccountView, RegisterView, GroupsView, PingsView
+    from newauth.blueprints import AccountView, RegisterView, GroupsView, PingsView, AdminView
     AccountView.register(app)
     RegisterView.register(app)
     GroupsView.register(app)
     PingsView.register(app)
+    AdminView.register(app)
 
     from newauth.assets import assets_env
     assets_env.init_app(app)

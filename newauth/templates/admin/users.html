@@ -1,0 +1,63 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Users | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="admin-users row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-fw fa-users"></i> Users</h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Corporation</th>
+                    <th>Alliance</th>
+                    <th>Status</th>
+                    <th>Registered</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users.items %}
+                    <tr>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.main_character.corporation_name }}</td>
+                        <td>{{ user.main_character.alliance_name }}</td>
+                        <td>{{ user.get_status().value}}</td>
+                        <td>{{ user.created_on|humanize }}</td>
+                        <td class="text-right"><a class="btn btn-info btn-xs" href="" disabled><i class="fa fa-fw fa-eye"></i> View (coming soon)</a></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No users found...</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <ul class="pagination pull-right">
+            {% if users.has_prev %}
+            <li><a href="{{ url_for('AdminsView:user', page=users.prev_num) }}">&laquo;</a></li>
+            {% endif %}
+            {%- for page in users.iter_pages() %}
+                {% if page %}
+                    {% if page != users.page %}
+                        <li><a href="{{ url_for('AdminsView:user', page=page) }}">{{ page }}</a></li>
+                    {% else %}
+                        <li class="active"><a href="#">{{ page }}</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="#">...</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if users.has_next %}
+                <li><a href="{{ url_for('AdminsView:user', page=users.next_num) }}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
