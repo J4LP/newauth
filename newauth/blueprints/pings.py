@@ -34,8 +34,9 @@ class PingsView(FlaskView):
                 scopes.append('Ally')
 
             current_user_admin = current_user.is_admin()
+            current_user_ping = current_user.can_ping()
 
-            if scopes and not current_user_admin:
+            if scopes and (not current_user_admin or not current_user_ping):
                 flash("You are not allowed to Ping to this scope.", 'danger')
                 return redirect(url_for('PingsView:new'))
 
@@ -63,7 +64,7 @@ class PingsView(FlaskView):
 
             groups_users = set()
             for group in groups:
-                if current_user.can_ping(group) or current_user_admin:
+                if current_user.can_ping_group(group) or current_user_admin or current_user_ping:
                     groups_users |= set(membership.user for membership in group.members.all())
                 else:
                     flash("You are not allowed to ping to group '{}'".format(group.name))
@@ -71,7 +72,7 @@ class PingsView(FlaskView):
 
             contacts_users = set()
             for contact in contacts:
-                if current_user.is_admin() or current_user_admin:
+                if current_user_admin or current_user_ping:
                     characters = Character.query.filter((Character.corporation_id==contact.id) | (Character.alliance_id==contact.id)).all()
                     contacts_users |= set(character.owner for character in characters)
                 else:

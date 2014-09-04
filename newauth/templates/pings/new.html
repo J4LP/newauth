@@ -37,7 +37,7 @@
                 <div class="panel-body">
                     <p>Who do you wish to send this ping to? Start to type a group name or a corporation or an alliance.</p>
                     <div class="form-group">
-                        {% if current_user.is_admin() %}
+                        {% if current_user.is_admin() or current_user.can_ping() %}
                         <div class="col-sm-12">
                             <label for="">Scopes</label>
                             <div class="checkbox">

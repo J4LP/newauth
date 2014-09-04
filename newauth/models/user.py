@@ -134,8 +134,18 @@ class User(db.Model):
     def is_admin_of(self, group):
         return True if group.members.filter_by(user_id=self.id, is_admin=True).first() else False
 
-    def can_ping(self, group):
+    def can_ping_group(self, group):
         return True if group.members.filter_by(user_id=self.id, can_ping=True).first() else False
+
+    def can_ping(self):
+        from newauth.models import Group
+        ping_group = Group.query.filter_by(name=current_app.config['PING_GROUP']).first()
+        if not ping_group:
+            current_app.logger.warning('Could not find PING_GROUP.')
+            return False
+        if not ping_group.members.filter_by(user_id=self.id).first():
+            return False
+        return True
 
     def has_applied_to(self, group):
         membership = group.members.filter_by(user_id=self.id).first()
@@ -149,7 +159,7 @@ class User(db.Model):
         if not admin_group:
             current_app.logger.warning('Could not find ADMIN_GROUP.')
             return False
-        if not admin_group.members.filter_by(user_id=current_user.id, is_admin=True).first():
+        if not admin_group.members.filter_by(user_id=self.id, is_admin=True).first():
             return False
         return True
 
