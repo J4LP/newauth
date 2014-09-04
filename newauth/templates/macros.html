@@ -8,18 +8,18 @@
     Example usage:
         {{ macros.render_field(form.email, placeholder='Input email', type='email') }}
 #}
-{% macro render_field(field, label_visible=true, horizontal=False) -%}
+{% macro render_field(field, label_visible=true, horizontal=False, label_class='col-sm-3', input_class='col-sm-9') -%}
 
     <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
         {% if (field.type != 'HiddenField' or field.type !='CSRFTokenField') and label_visible %}
             {% if horizontal %}
-                <label class="col-sm-3 control-label" for="{{ field.id }}">{{ field.label }}</label>
+                <label class="{{ label_class }} control-label" for="{{ field.id }}">{{ field.label }}</label>
             {% else %}
                 <label for="{{ field.id }}" class="control-label">{{ field.label }}</label>
             {% endif %}
         {% endif %}
         {% if horizontal %}
-        <div class="col-sm-9">
+        <div class="{{ input_class }}">
         {% endif %}
         {% if kwargs.get('addon') %}
             <div class="input-group">

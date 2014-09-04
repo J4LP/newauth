@@ -10,26 +10,40 @@
         <h1><i class="fa fa-user fa-fw"></i> Account</h1>
         <hr/>
     </div>
-    <div class="col-md-6 col-md-offset-3">
-        <h3><i class="fa fa-info-circle fa-fw"></i>Informations</h3>
-        <hr/>
-        {% call macros.render_form(account_form, action_url=url_for('AccountView:profile'), action_text='<i class="fa fa-save fa-fw"></i> Change password', class_='register-member-form form-horizontal', btn_class='btn btn-block btn-success') %}
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Status</label>
-                <div class="col-sm-9">
-                    <p class="form-control-static">{{ current_user.get_status().value }}</p>
+    {% call macros.render_form(account_form, action_url=url_for('AccountView:profile'), class_='register-member-form form-horizontal') %}
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Status</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{ current_user.get_status().value }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="col-md-6">
             {{ macros.render_field(account_form.user_id, placeholder='Email', horizontal=True, readonly=True) }}
             {{ macros.render_field(account_form.email, placeholder='Email', horizontal=True) }}
             {{ macros.render_field(account_form.main_character, horizontal=True) }}
-            <button type="submit" class="btn btn-block btn-primary"><i class="fa fa-save"></i> Update</button>
-            <hr/>
-            {{ macros.render_field(account_form.password, placeholder='Current Password', horizontal=True) }}
-            {{ macros.render_field(account_form.new_password, placeholder='New Password', horizontal=True) }}
-            {{ macros.render_field(account_form.confirm, placeholder='Confirm New Password', horizontal=True) }}
-        {% endcall %}
-    </div>
+            <div class="form-group">
+                <div class="col-sm-9 col-sm-offset-3">
+                    <button type="submit" class="btn btn-block btn-primary"><i class="fa fa-save"></i> Update</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            {{ macros.render_field(account_form.password, placeholder='Current Password', horizontal=True, label_class='col-sm-4', input_class='col-sm-8') }}
+            {{ macros.render_field(account_form.new_password, placeholder='New Password', horizontal=True, label_class='col-sm-4', input_class='col-sm-8') }}
+            {{ macros.render_field(account_form.confirm, placeholder='Confirm New Password', horizontal=True, label_class='col-sm-4', input_class='col-sm-8') }}
+            <div class="form-group">
+                <div class="col-sm-8 col-sm-offset-4">
+                    <button type="submit" class="btn btn-block btn-success"><i class="fa fa-save fa-fw"></i> Change password</button>
+                </div>
+            </div>
+        </div>
+    {% endcall %}
     <div class="account-profile-characters col-md-12">
         <h3><i class="fa fa-users"></i> Characters and Keys {% call macros.render_form(None, action_url=url_for('AccountView:update_api'), class_="form-inline", btn_class="pull-right btn btn-info", action_text='<i class="fa fa-refresh fa-fw"></i> Update characters') %}
             <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">{% endcall %}</h3>
