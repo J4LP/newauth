@@ -1,6 +1,7 @@
 import logging
 import sys
 from ldap3 import SEARCH_SCOPE_WHOLE_SUBTREE
+from flask import current_app
 from flask.ext.assets import ManageAssets
 from flask.ext.migrate import MigrateCommand
 from flask.ext.script import Manager, Server
@@ -62,6 +63,7 @@ def import_from_ldap():
     :return:
     """
     with app.app_context():
+        app.debug = True
         ldap_users = []
         with ldap_sync.connection as c:
             result = c.search(app.config['SYNC_LDAP_MEMBERDN'], '(uid=*)', SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
@@ -84,20 +86,29 @@ def import_from_ldap():
                         key_id=ldap_user.keyID,
                         vcode=ldap_user.vCode
                     )
-                    for character in api_key.get_characters():
-                        user_model.characters.append(character)
+                    try:
+                        api_key.update_api_key()
+                        for character in api_key.get_characters():
+                            user_model.characters.append(character)
+                    except Exception as e:
+                        app.logger.exception(e)
+
                     for character in user_model.characters:
                         if character.name == ldap_user.characterName:
                             user_model.main_character_id = character.id
                             break
-                    api_key.update_api_key()
+
                     user_model.api_keys.append(api_key)
                     db.session.add(user_model)
                     db.session.commit()
-                    user_model.update_keys()
-                    user_model.update_status()
+                    try:
+                        user_model.update_keys()
+                        user_model.update_status()
+                    except Exception as e:
+                        app.logger.exception(e)
                     db.session.add(user_model)
                     db.session.commit()
+                    app.logger.debug('{} has been imported.'.format(ldap_user.uid))
 
 
 if __name__ == '__main__':
