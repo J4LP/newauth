@@ -74,7 +74,13 @@ class User(db.Model):
         return unicode(self.id)
 
     def get_status(self):
-        return CharacterStatus(self.status)
+        try:
+            return CharacterStatus(self.status)
+        except Exception:
+            self.set_status(CharacterStatus.ineligible)
+            db.session.add(self)
+            db.session.commit()
+            return CharacterStatus.ineligible
 
     def set_status(self, status):
         self.status = status.value
