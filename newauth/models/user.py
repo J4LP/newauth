@@ -13,7 +13,7 @@ class User(db.Model):
     password = db.Column(db.String)
     name = db.Column(db.String)
     email = db.Column(db.String, unique=True)
-    status = db.Column(db.String)
+    status = db.Column(db.String, default='Ineligible')
     active = db.Column(db.Boolean, default=True)
     last_ip = db.Column(db.String, default='127.0.0.1')
     last_login_on = db.Column(db.DateTime, default=db.func.now())
