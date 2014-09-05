@@ -13,6 +13,7 @@ class GroupsView(FlaskView):
     decorators = [login_required]
 
     def index(self):
+        query = request.args.get('query')
         filter = request.args.get('filter')
         if filter == 'member':
             groups = Group.query.filter(Group.members.any(user_id=current_user.id)).all()
@@ -20,9 +21,12 @@ class GroupsView(FlaskView):
             groups = Group.query.filter((Group.members.any(user_id=current_user.id, is_applying=True)) | (Group.invites.any(recipient_id=current_user.id))).all()
         if not filter or filter == 'all':
             groups = Group.query.all()
+        if query:
+            groups = Group.query.filter(Group.name.ilike('%' + query + '%')).all()
+            print(groups)
         new_group_form = GroupCreateForm()
         new_group_form.type.choices = [(element.name, element.value) for element in list(GroupType)]
-        return render_template('groups/index.html', groups=groups, new_group_form=new_group_form)
+        return render_template('groups/index.html', groups=groups, new_group_form=new_group_form, query=query)
 
     @route('/new', methods=['POST'])
     @is_admin
