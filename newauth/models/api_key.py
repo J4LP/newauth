@@ -90,3 +90,5 @@ class APIKey(db.Model):
         for name, requirement in current_app.config['EVE']['requirements'].iteritems():
             if self.mask == requirement['mask']:
                 return name
+        return 'Unrecognized type'
+
