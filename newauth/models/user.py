@@ -165,7 +165,7 @@ class User(db.Model):
         if not admin_group:
             current_app.logger.warning('Could not find ADMIN_GROUP.')
             return False
-        if not admin_group.members.filter_by(user_id=self.id, is_admin=True).first():
+        if not admin_group.members.filter_by(user_id=self.id, is_applying=False).first():
             return False
         return True
 
