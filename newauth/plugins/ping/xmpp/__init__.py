@@ -56,7 +56,7 @@ class XMPPPinger(Pinger):
     def send_ping(self):
 
         def do_ping(ping, config, users):
-            self.AnnounceBot(config['user'] + '@' + config['host'], config['password'], config, ping, users)
+            self.AnnounceBot(config['user'] + '@' + config['host'] + '/auth', config['password'], config, ping, users)
 
         executor = futures.ThreadPoolExecutor(max_workers=1)
         executor.submit(do_ping, self.ping, self.config, self.ping.users.all())
