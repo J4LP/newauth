@@ -56,10 +56,13 @@
                     <h3 class="panel-title">Key #{{ api_key.key_id }} - {{ api_key.get_auth_type().capitalize() }}</h3>
                 </div>
                 <div class="panel-body">
-                    {% if api_key.get_status() == APIKeyStatus.invalid_mask %}
+                    {% if api_key.get_status() == APIKeyStatus.valid %}
+                    {% elif api_key.get_status() == APIKeyStatus.invalid_mask %}
                         <div class="alert alert-danger">This API Key does not have a valid mask.</div>
                     {% elif api_key.get_status() == APIKeyStatus.invalid_expiration %}
                         <div class="alert alert-danger">This API Key has an expiration date where it should not.</div>
+                    {% elif api_key.get_status() == APIKeyStatus.invalid %}
+                        <div class="alert alert-danger">This API Key is invalid. Please edit or delete it.</div>
                     {% endif %}
                     <div class="row">
                         {% for character in api_key.characters.order_by('id').all() %}

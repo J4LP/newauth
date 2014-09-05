@@ -16,6 +16,7 @@ class APIKeyStatus(Enum):
     valid = 'Valid'
     invalid_mask = 'Invalid Mask'
     invalid_expiration = 'Invalid Expiration'
+    invalid = 'Invalid'
 
 
 class CharacterStatus(Enum):

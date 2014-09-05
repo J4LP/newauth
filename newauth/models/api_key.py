@@ -55,7 +55,13 @@ class APIKey(db.Model):
         self.status = status.value
 
     def get_status(self):
-        return APIKeyStatus(self.status)
+        try:
+            return APIKeyStatus(self.status)
+        except Exception:
+            self.status = 'Invalid'
+            db.session.add(self)
+            db.session.commit()
+            return 'Invalid'
 
     def get_characters(self):
         from newauth.models import Character
