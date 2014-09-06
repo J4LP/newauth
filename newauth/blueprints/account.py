@@ -73,6 +73,7 @@ class AccountView(FlaskView):
             form.populate_obj(api_key)
             try:
                 api_key.update_api_key()
+                api_key.validate(save=False)
             except AuthenticationException:
                 flash('Could not authenticate with this API Key', 'danger')
                 return redirect(url_for('AccountView:profile'))
@@ -109,6 +110,7 @@ class AccountView(FlaskView):
                 api_key.vcode = form.vcode.data
                 try:
                     api_key.update_api_key()
+                    api_key.validate(save=False)
                 except AuthenticationException:
                     flash('Could not authenticate with this API Key', 'error')
                     return redirect(url_for('AccountView:profile'))

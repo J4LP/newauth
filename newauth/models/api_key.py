@@ -77,7 +77,7 @@ class APIKey(db.Model):
         ) for c in api_info.characters.row]
         return self.characters
 
-    def validate(self):
+    def validate(self, save=True):
         mask_name = None
         for name, requirement in current_app.config['EVE']['requirements'].iteritems():
             if self.mask == requirement['mask']:
@@ -89,8 +89,9 @@ class APIKey(db.Model):
                 break
         else:
             self.set_status(APIKeyStatus.invalid_mask)
-        db.session.add(self)
-        db.session.commit()
+        if save:
+            db.session.add(self)
+            db.session.commit()
 
     def get_auth_type(self):
         for name, requirement in current_app.config['EVE']['requirements'].iteritems():
