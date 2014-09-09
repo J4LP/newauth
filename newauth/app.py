@@ -2,6 +2,7 @@ import os
 from blinker import Namespace
 from flask import Flask, redirect, url_for
 from flask_wtf import CsrfProtect
+from werkzeug.utils import import_string
 
 newauth_signals = Namespace()
 
@@ -40,8 +41,9 @@ def create_app():
     app.jinja_env.globals['GroupType'] = GroupType
 
     # Initialize NewAuth plugins
-    from newauth.plugins.sync.ldap import ldap_sync
-    ldap_sync.init_app(app)
+    for plugin in app.config['PLUGINS']:
+        imported_plugin = import_string(plugin)
+        imported_plugin.init_app(app)
 
     @app.route('/')
     def home():

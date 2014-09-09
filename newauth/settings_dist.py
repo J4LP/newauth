@@ -24,7 +24,7 @@ class BaseConfig(object):
     #: Turn on debug mode for SQLAlchemy (prints out queries)
     SQLALCHEMY_ECHO = os.getenv('DEBUG', True)
 
-    #: Eve related settings
+    #: Eve related settings, see :ref:`eve_settings`.
     EVE = {
         'auth_name': 'Your alliance name',
         'requirements': {
@@ -47,6 +47,9 @@ class BaseConfig(object):
 
     #: Runtime configuration for pingers
     PINGERS_SETTINGS = {}
+
+    #: Settings
+    PLUGINS = []
 
 
 class DevConfig(BaseConfig):
