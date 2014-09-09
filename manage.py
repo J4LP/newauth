@@ -8,7 +8,7 @@ from flask.ext.script import Manager, Server
 from newauth.app import create_app
 from newauth.models import db, AuthContact, User, Group, GroupMembership, APIKey
 from newauth.models.enums import GroupType
-from newauth.plugins.sync.ldap import ldap_sync, LDAPUser
+from newauth.plugins.sync.ldap import LDAPUser
 
 app = create_app()
 
@@ -65,7 +65,7 @@ def import_from_ldap():
     with app.app_context():
         app.debug = True
         ldap_users = []
-        with ldap_sync.connection as c:
+        with app.loaded_plugins['newauth.plugins.sync.ldap.LDAPSync'].connection as c:
             result = c.search(app.config['SYNC_LDAP_MEMBERDN'], '(uid=*)', SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
             if result:
                 for user in c.response:
@@ -100,7 +100,7 @@ def import_from_ldap():
 
                     user_model.api_keys.append(api_key)
                     db.session.add(user_model)
-                    db.session.commit()
+                    db.session.flush()
                     try:
                         user_model.update_keys()
                         user_model.update_status()
