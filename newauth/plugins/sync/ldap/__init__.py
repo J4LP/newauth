@@ -118,6 +118,3 @@ class LDAPSync(object):
             c.modify(ldap_user.dn, {'userPassword': (MODIFY_REPLACE, [ldap_salted_sha1.encrypt(password)])})
             result = c.result
 
-
-ldap_sync = LDAPSync()
-
