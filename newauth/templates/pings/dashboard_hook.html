@@ -13,12 +13,12 @@
                 </tr>
             </thead>
             <tbody>
-                {% for ping in current_user.pings_received.all()[:10] %}
+                {% for ping in pings %}
                     <tr>
                         <td><i class="fa fa-fw {{ ping.category.icon }}"></i> {{ ping.category.name }}</td>
                         <td>{{ ping.sender.name }}</td>
                         <td>{{ ping.recipients }}</td>
-                        <td><a href="#">{{ ping.created_on|humanize }}</a></td>
+                        <td><a href="{{ url_for('PingsView:ping', ping_id=ping.id) }}">{{ ping.created_on|humanize }}</a></td>
                     </tr>
                 {% endfor %}
             </tbody>

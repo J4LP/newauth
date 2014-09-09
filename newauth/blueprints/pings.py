@@ -161,4 +161,5 @@ class PingsView(FlaskView):
 
     @staticmethod
     def _dashboard_hook(self):
-        return render_template('pings/dashboard_hook.html')
+        pings = current_user.pings_received.order_by(db.desc(Ping.created_on)).all()[:10]
+        return render_template('pings/dashboard_hook.html', pings=pings)
