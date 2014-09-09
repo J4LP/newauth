@@ -80,15 +80,15 @@ class APIKey(db.Model):
     def validate(self, save=True):
         mask_name = None
         for name, requirement in current_app.config['EVE']['requirements'].iteritems():
-            if self.mask == requirement['mask']:
+            if self.mask >= requirement['mask']:
                 mask_name = name
-                if self.expires != current_app.config['EVE']['requirements'][mask_name]['expires']:
-                    self.set_status(APIKeyStatus.invalid_expiration)
-                else:
-                    self.set_status(APIKeyStatus.valid)
-                break
-        else:
+        if not mask_name:
             self.set_status(APIKeyStatus.invalid_mask)
+        else:
+            if self.expires != current_app.config['EVE']['requirements'][mask_name]['expires']:
+                self.set_status(APIKeyStatus.invalid_expiration)
+            else:
+                self.set_status(APIKeyStatus.valid)
         if save:
             db.session.add(self)
             db.session.commit()
