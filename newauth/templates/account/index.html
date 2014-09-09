@@ -5,8 +5,11 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <h1><i class="fa fa-dashboard fa-fw"></i> Dashboard <small>Coming soon near you!</small></h1>
+            <h1><i class="fa fa-dashboard fa-fw"></i> Dashboard</h1>
             <hr/>
         </div>
+        {% for dashboard_hook in hooks.dashboard_hooks %}
+            {{ dashboard_hook(current_user)|safe }}
+        {% endfor %}
     </div>
 {% endblock %}
