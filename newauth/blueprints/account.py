@@ -153,11 +153,13 @@ class AccountView(FlaskView):
             user = User.query.filter_by(user_id=form.user_id.data).first()
             if not user or not user.check_password(form.password.data):
                 current_app.logger.warning('Invalid login with user_id "{}"'.format(form.user_id.data))
+                User.login_fail.send(current_app._get_current_object(), user=user)
                 flash('Invalid credentials.', 'danger')
                 return redirect(url_for('AccountView:login'))
             if login_user(user):
                 user.last_login_on = datetime.datetime.utcnow()
                 user.last_ip = request.remote_addr
+                User.login_success.send(current_app._get_current_object(), user=user)
                 db.session.add(user)
                 db.session.commit()
                 flash('Welcome back {}!'.format(user.main_character.name))

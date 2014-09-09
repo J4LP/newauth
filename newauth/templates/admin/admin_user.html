@@ -43,7 +43,7 @@
         </div>
     {% endcall %}
     <div class="account-profile-characters col-md-12">
-        <h3><i class="fa fa-users"></i> Characters and Keys {% call macros.render_form(None, action_url=url_for('AdminView:update_user', user_id=user.user_id), class_="form-inline", btn_class="pull-right btn btn-info", action_text='<i class="fa fa-refresh fa-fw"></i> Update characters') %}
+        <h3><i class="fa fa-fw fa-users"></i> Characters and Keys {% call macros.render_form(None, action_url=url_for('AdminView:update_user', user_id=user.user_id), class_="form-inline", btn_class="pull-right btn btn-info", action_text='<i class="fa fa-refresh fa-fw"></i> Update characters') %}
             <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">{% endcall %}</h3>
         <hr/>
     </div>
@@ -99,7 +99,6 @@
         {% endfor %}
         <button data-toggle="modal" data-target="#new-key" class="btn btn-success"><i class="fa fa-plus fa-fw"></i> Add API Key</button>
     </div>
-</div>
     {% for api_form in api_forms %}
             <div class="modal fade" id="edit-key-{{ api_form.key_id.data }}">
                 <div class="modal-dialog">
@@ -138,30 +137,40 @@
             </div>
         {% endfor %}
     <div class="modal fade" id="new-key">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">New API Key</h4>
-                    </div>
-                    {% call macros.render_form(new_api_form, action_url=url_for('AdminView:add_user_apikey', user_id=user.user_id), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
-                        <div class="modal-body">
-                            <div class="alert alert-warning">This will trigger a refresh of this account. User access to
-                                services might be disabled as a result.
-                            </div>
-                            <p>Here's the API keys we are accepting:</p>
-                            <ul>
-                                {% for name, requirement in config.EVE.requirements.iteritems() %}
-                                    <li><a target="_blank" href="https://support.eveonline.com/api/key/CreatePredefined/{{ requirement.mask }}">{{ name.capitalize() }}</a>: Mask {{ requirement.mask }}, Expires: {{ requirement.expires }}</li>
-                                {% endfor %}
-                            </ul>
-                            <hr/>
-                            {{ macros.render_field(new_api_form.key_id, placeholder='KeyID', horizontal=True) }}
-                            {{ macros.render_field(new_api_form.vcode, placeholder='vCode', horizontal=True) }}
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">New API Key</h4>
+                </div>
+                {% call macros.render_form(new_api_form, action_url=url_for('AdminView:add_user_apikey', user_id=user.user_id), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                    <div class="modal-body">
+                        <div class="alert alert-warning">This will trigger a refresh of this account. User access to
+                            services might be disabled as a result.
                         </div>
-                        <div class="modal-footer">
-                    {% endcall %}
+                        <p>Here's the API keys we are accepting:</p>
+                        <ul>
+                            {% for name, requirement in config.EVE.requirements.iteritems() %}
+                                <li><a target="_blank" href="https://support.eveonline.com/api/key/CreatePredefined/{{ requirement.mask }}">{{ name.capitalize() }}</a>: Mask {{ requirement.mask }}, Expires: {{ requirement.expires }}</li>
+                            {% endfor %}
+                        </ul>
+                        <hr/>
+                        {{ macros.render_field(new_api_form.key_id, placeholder='KeyID', horizontal=True) }}
+                        {{ macros.render_field(new_api_form.vcode, placeholder='vCode', horizontal=True) }}
                     </div>
+                    <div class="modal-footer">
+                {% endcall %}
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<div class="admin-user-hooks row">
+    <div class="col-md-12">
+        <h3><i class="fa fa-fw fa-info"></i> Extra plugins</h3>
+        <hr/>
+    </div>
+    {% for admin_user_hook in hooks.admin_user_hooks %}
+        {{ admin_user_hook(user)|safe }}
+    {% endfor %}
+</div>
 {% endblock %}

@@ -30,6 +30,8 @@ class User(db.Model):
 
     password_updated = newauth_signals.signal('user-updated-password')
     new_user = newauth_signals.signal('user-new')
+    login_success = newauth_signals.signal('user-login-success')
+    login_fail = newauth_signals.signal('user-login-fail')
 
     def update_password(self, new_password):
         """Hash a new password to bcrypt.

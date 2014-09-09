@@ -23,6 +23,16 @@ def create_app():
     redis.init_app(app)
     login_manager.init_app(app)
 
+    # Initialize NewAuth plugins
+    app.loaded_plugins = {}
+    app.admin_user_hooks = []
+    app.dashboard_hooks = []
+
+    for plugin in app.config['PLUGINS']:
+        imported_plugin = import_string(plugin)()
+        imported_plugin.init_app(app)
+        app.loaded_plugins[plugin] = imported_plugin
+
     from newauth.blueprints import AccountView, RegisterView, GroupsView, PingsView, AdminView
     AccountView.register(app)
     RegisterView.register(app)
@@ -40,10 +50,6 @@ def create_app():
     app.jinja_env.filters['markdown'] = markdown_filter
     app.jinja_env.globals['GroupType'] = GroupType
 
-    # Initialize NewAuth plugins
-    for plugin in app.config['PLUGINS']:
-        imported_plugin = import_string(plugin)
-        imported_plugin.init_app(app)
 
     @app.route('/')
     def home():
@@ -55,7 +61,11 @@ def create_app():
             'Message': Message,
             'CharacterStatus': CharacterStatus,
             'GroupType': GroupType,
-            'APIKeyStatus': APIKeyStatus
+            'APIKeyStatus': APIKeyStatus,
+            'hooks': {
+                'admin_user_hooks': app.admin_user_hooks,
+                'dashboard_hooks': app.dashboard_hooks
+            }
         }
 
     return app
