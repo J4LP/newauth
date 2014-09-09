@@ -60,3 +60,4 @@ newauth/settings.py
 newauth/public/.webassets-cache
 newauth/public/css
 newauth/public/js
+migrations/versions
