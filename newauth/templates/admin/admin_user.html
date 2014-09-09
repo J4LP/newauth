@@ -1,0 +1,167 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Profile | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="account-profile row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-user fa-fw"></i> Administrating {{ user.name }}</h1>
+        <hr/>
+    </div>
+    {% call macros.render_form(account_admin_form, action_url=url_for('AdminView:admin_user', user_id=user.user_id), class_='register-member-form form-horizontal') %}
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Status</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{ current_user.get_status().value }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            {{ macros.render_field(account_admin_form.user_id, placeholder='User ID', horizontal=True, readonly=True) }}
+            {{ macros.render_field(account_admin_form.email, placeholder='Email', horizontal=True) }}
+            {{ macros.render_field(account_admin_form.main_character, horizontal=True) }}
+            <div class="form-group">
+                <div class="col-sm-9 col-sm-offset-3">
+                    <button type="submit" class="btn btn-block btn-primary"><i class="fa fa-save"></i> Update</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            {{ macros.render_field(account_admin_form.new_password, placeholder='New Password', horizontal=True) }}
+            <div class="form-group">
+                <div class="col-sm-9 col-sm-offset-3">
+                    <button type="submit" class="btn btn-block btn-success"><i class="fa fa-save fa-fw"></i> Change password</button>
+                </div>
+            </div>
+        </div>
+    {% endcall %}
+    <div class="account-profile-characters col-md-12">
+        <h3><i class="fa fa-users"></i> Characters and Keys {% call macros.render_form(None, action_url=url_for('AdminView:update_user', user_id=user.user_id), class_="form-inline", btn_class="pull-right btn btn-info", action_text='<i class="fa fa-refresh fa-fw"></i> Update characters') %}
+            <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">{% endcall %}</h3>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        {% for api_key in user.api_keys %}
+            <div class="panel panel-turquoise">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Key #{{ api_key.key_id }} - {{ api_key.get_auth_type().capitalize() }}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if api_key.get_status() == APIKeyStatus.valid %}
+                    {% elif api_key.get_status() == APIKeyStatus.invalid_mask %}
+                        <div class="alert alert-danger">This API Key does not have a valid mask.</div>
+                    {% elif api_key.get_status() == APIKeyStatus.invalid_expiration %}
+                        <div class="alert alert-danger">This API Key has an expiration date where it should not.</div>
+                    {% elif api_key.get_status() == APIKeyStatus.invalid %}
+                        <div class="alert alert-danger">This API Key is invalid. Please edit or delete it.</div>
+                    {% endif %}
+                    <div class="row">
+                        {% for character in api_key.characters.order_by('id').all() %}
+                            <div class="col-md-4">
+                                <div class="media well">
+                                    <a class="pull-left" href=""><img src="https://image.eveonline.com/Character/{{character.id}}_64.jpg" alt="{{character.name}}" class="media-object img-circle"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">{% if character.id == user.main_character_id %}<i class="fa fa-star"></i>{% endif %} {{ character.name }}</h4>
+                                        <dl>
+                                            <dt>Corporation</dt>
+                                            <dd>{{ character.corporation_name }}</dd>
+                                            <dt>Alliance</dt>
+                                            {% if character.alliance_name %}
+                                                <dd>{{ character.alliance_name }}</dd>
+                                            {% else %}
+                                                <dd>No alliance</dd>
+                                            {% endif %}
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-4">
+                            <button class="btn btn-block btn-primary" data-toggle="modal" data-target="#edit-key-{{ api_key.key_id }}"><i class="fa fa-edit fa-fw"></i> Edit</button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-block btn-danger" data-toggle="modal" data-target="#delete-key-{{ api_key.key_id }}"><i class="fa fa-trash-o fa-fw"></i> Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <button data-toggle="modal" data-target="#new-key" class="btn btn-success"><i class="fa fa-plus fa-fw"></i> Add API Key</button>
+    </div>
+</div>
+    {% for api_form in api_forms %}
+            <div class="modal fade" id="edit-key-{{ api_form.key_id.data }}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Edit API Key #{{ api_form.key_id.data }}</h4>
+                        </div>
+                        {% call macros.render_form(api_form, action_url=url_for('AdminView:edit_user_apikey', user_id=user.user_id, key_id=api_form.key_id.data), action_text='<i class="fa fa-save fa-fw"></i> Update', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                        <div class="modal-body">
+                            <div class="alert alert-warning">This will trigger a refresh of this account. User access to services might be disabled as a result.</div>
+                            {{ macros.render_field(api_form.key_id, placeholder='KeyID', horizontal=True) }}
+                            {{ macros.render_field(api_form.vcode, placeholder='vCode', horizontal=True) }}
+                        </div>
+                        <div class="modal-footer">
+                            {% endcall %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="delete-key-{{ api_form.key_id.data }}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Delete API Key #{{ api_form.key_id.data }}</h4>
+                        </div>
+                        {% call macros.render_form(api_form, action_url=url_for('AdminView:delete_user_apikey', user_id=user.user_id, key_id=api_form.key_id.data), action_text='<i class="fa fa-trash-o fa-fw"></i> Delete', class_='form-horizontal', btn_class='btn btn-block btn-danger') %}
+                        <div class="modal-body">
+                            <div class="alert alert-warning">This will trigger a refresh of this account. User access to services might be disabled as a result.</div>
+                            <p>Are you sure you want to delete this API Key? Associated characters will also be deleted.</p>
+                        </div>
+                        <div class="modal-footer">
+                            {% endcall %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    <div class="modal fade" id="new-key">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">New API Key</h4>
+                    </div>
+                    {% call macros.render_form(new_api_form, action_url=url_for('AdminView:add_user_apikey', user_id=user.user_id), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                        <div class="modal-body">
+                            <div class="alert alert-warning">This will trigger a refresh of this account. User access to
+                                services might be disabled as a result.
+                            </div>
+                            <p>Here's the API keys we are accepting:</p>
+                            <ul>
+                                {% for name, requirement in config.EVE.requirements.iteritems() %}
+                                    <li><a target="_blank" href="https://support.eveonline.com/api/key/CreatePredefined/{{ requirement.mask }}">{{ name.capitalize() }}</a>: Mask {{ requirement.mask }}, Expires: {{ requirement.expires }}</li>
+                                {% endfor %}
+                            </ul>
+                            <hr/>
+                            {{ macros.render_field(new_api_form.key_id, placeholder='KeyID', horizontal=True) }}
+                            {{ macros.render_field(new_api_form.vcode, placeholder='vCode', horizontal=True) }}
+                        </div>
+                        <div class="modal-footer">
+                    {% endcall %}
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

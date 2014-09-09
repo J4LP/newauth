@@ -60,3 +60,10 @@ class PingForm(Form):
     internal = BooleanField('Internal', default=False)
     ally = BooleanField('Ally', default=False)
     recipients = StringField('Recipients')
+
+
+class AccountAdminUpdateForm(Form):
+    user_id = StringField('User ID', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    main_character = SelectField('Main Character', coerce=int, validators=[DataRequired()])
+    new_password = PasswordField('New Password')

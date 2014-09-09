@@ -30,7 +30,7 @@
                         <td>{{ user.main_character.alliance_name }}</td>
                         <td>{{ user.get_status().value}}</td>
                         <td>{{ user.created_on|humanize }}</td>
-                        <td class="text-right"><a class="btn btn-info btn-xs" href="" disabled><i class="fa fa-fw fa-eye"></i> View (coming soon)</a></td>
+                        <td class="text-right"><a class="btn btn-info btn-xs" href="{{ url_for('AdminView:admin_user', user_id=user.user_id) }}"><i class="fa fa-fw fa-eye"></i> View</a></td>
                     </tr>
                 {% else %}
                     <tr>

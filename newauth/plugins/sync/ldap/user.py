@@ -142,7 +142,7 @@ class LDAPUser(LDAPDocument):
                     if k in cls.INT_ATTRIBUTES:
                         setattr(user, k, int(v[0]))
                         user._original_ldap_attributes[k] = int(v[0])
-                    else:
+                    elif v:
                         setattr(user, k, v[0])
                         user._original_ldap_attributes[k] = v[0]
         return user
@@ -159,12 +159,12 @@ class LDAPUser(LDAPDocument):
             self.characterName = model.main_character.name
             self.alliance = model.main_character.alliance_name
             self.corporation = model.main_character.corporation_name
+            self.keyID = model.main_character.api_key.key_id
+            self.vCode = model.main_character.api_key.vcode
         else:
             self.characterName = ''
             self.alliance = ''
             self.corporation = ''
-        self.keyID = model.main_character.api_key.key_id
-        self.vCode = model.main_character.api_key.vcode
         self.authGroup = [membership.group.name for membership in model.groups.filter_by(is_applying=False)]
 
     def changes(self):
