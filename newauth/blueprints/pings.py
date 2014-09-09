@@ -16,6 +16,15 @@ class PingsView(FlaskView):
         pings = current_user.pings_received.order_by(db.desc(Ping.created_on)).all()
         return render_template('pings/history.html', pings=pings)
 
+    @classmethod
+    def register(cls, app, route_base=None, subdomain=None, route_prefix=None, trailing_slash=None):
+        if hasattr(app, 'dashboard_hooks'):
+            app.dashboard_hooks.append(cls._dashboard_hook)
+        else:
+            app.dashboard_hooks = [cls._dashboard_hook]
+        return super(PingsView, cls).register(app, route_base, subdomain, route_prefix, trailing_slash)
+
+
     @route('new/', methods=['GET', 'POST'])
     def new(self):
         categories = PingCategory.query.all()
@@ -149,3 +158,7 @@ class PingsView(FlaskView):
         if not ping:
             abort(404)
         return render_template('pings/ping.html', ping=ping)
+
+    @staticmethod
+    def _dashboard_hook(self):
+        return render_template('pings/dashboard_hook.html')

@@ -1,0 +1,27 @@
+<div class="col-md-6">
+    <div class="panel panel-turquoise">
+        <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-fw fa-envelope"></i> Latest pings</h3>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Sender</th>
+                    <th>To</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ping in current_user.pings_received.all()[:10] %}
+                    <tr>
+                        <td><i class="fa fa-fw {{ ping.category.icon }}"></i> {{ ping.category.name }}</td>
+                        <td>{{ ping.sender.name }}</td>
+                        <td>{{ ping.recipients }}</td>
+                        <td><a href="#">{{ ping.created_on|humanize }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
