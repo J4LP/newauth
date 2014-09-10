@@ -30,7 +30,9 @@ class AccountView(FlaskView):
                 db.session.add(current_user)
                 db.session.commit()
                 User.password_updated.send(current_app._get_current_object(), model=current_user, password=account_form.new_password.data)
+                ip = session['ip']
                 session.clear()
+                session['ip'] = ip
                 flash('Your password has been updated, please login again.')
                 return redirect(url_for('AccountView:login'))
             current_user.email = account_form.email.data
