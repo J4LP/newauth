@@ -153,7 +153,7 @@ class AccountView(FlaskView):
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(user_id=form.user_id.data.lower()).first()
-            if not user or not user.check_password(form.password.data.lower()):
+            if not user or not user.check_password(form.password.data):
                 current_app.logger.warning('Invalid login with user_id "{}"'.format(form.user_id.data.lower()))
                 User.login_fail.send(current_app._get_current_object(), user=user)
                 flash('Invalid credentials.', 'danger')
