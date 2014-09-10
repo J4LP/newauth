@@ -147,7 +147,7 @@ class LDAPSync(object):
                         if User.query.filter_by(user_id=user['attributes']['uid'][0]).first():
                             current_app.logger.debug('{} is already registered.'.format(user['attributes']['uid'][0]))
                             return
-                        #LDAPSync.import_user(user)
+                        LDAPSync.import_user(user)
                 else:
                     result = c.search(current_app.config['SYNC_LDAP_MEMBERDN'], '(uid=*)', SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
                     if result:
@@ -160,7 +160,7 @@ class LDAPSync(object):
                             if user['attributes']['email'][0] in db_user_emails:
                                 current_app.logger.debug('{} is already registered.'.format(user['attributes']['email'][0]))
                                 continue
-                            #LDAPSync.import_user(user)
+                            LDAPSync.import_user(user)
 
     @staticmethod
     def import_user(user):
