@@ -91,6 +91,6 @@ Management commands
 
 ::
 
-    python manage.py ldap import_users
+    python manage.py ldap import_users [--user_id $USER_ID]
 
-This command will import all users in `SYNC_LDAP_MEMBERDN`. We recommend making a backup of your LDAP server before though.
+This command will import all users in `SYNC_LDAP_MEMBERDN`. We recommend making a backup of your LDAP server before though. If you include add `--user_id` it will only import this user.

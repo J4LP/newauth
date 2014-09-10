@@ -128,7 +128,7 @@ class LDAPSync(object):
 
     @staticmethod
     @ExtraCommands.command
-    def import_users():
+    def import_users(user_id=None):
         """
         This command will read all entries in a ldap directory and import its users,
         running the necessary API calls.
@@ -138,46 +138,69 @@ class LDAPSync(object):
             current_app.debug = True
             ldap_users = []
             with current_app.loaded_plugins['newauth.plugins.sync.ldap.LDAPSync'].connection as c:
-                result = c.search(current_app.config['SYNC_LDAP_MEMBERDN'], '(uid=*)', SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
-                if result:
-                    for user in c.response:
-                        # Is user already in Db ?
-                        password = user['attributes']['userPassword'][0]
-                        ldap_user = LDAPUser.from_ldap(user)
-                        user_db = User.query.filter_by(user_id=ldap_user.uid).first()
-                        if user_db:
-                            current_app.logger.debug('{} is already registered.'.format(ldap_user.uid))
-                            continue
-                        user_model = User(
-                            user_id=ldap_user.uid,
-                            email=ldap_user.email,
-                            password=password,
-                            name=ldap_user.characterName
-                        )
-                        api_key = APIKey(
-                            key_id=ldap_user.keyID,
-                            vcode=ldap_user.vCode
-                        )
-                        try:
-                            api_key.update_api_key()
-                            for character in api_key.get_characters():
-                                user_model.characters.append(character)
-                        except Exception as e:
-                            current_app.logger.exception(e)
+                if user_id:
+                    result = c.search(current_app.config['SYNC_LDAP_MEMBERDN'], '(uid={})'.format(user_id), SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
+                    if result:
+                        if len(c.response) > 1:
+                            raise Exception('Found more than one result for uid {}'.format(user_id))
+                        user = c.response[0]
+                        if User.query.filter_by(user_id=user['attributes']['uid'][0]).first():
+                            current_app.logger.debug('{} is already registered.'.format(user['attributes']['uid'][0]))
+                            return
+                        #LDAPSync.import_user(user)
+                else:
+                    result = c.search(current_app.config['SYNC_LDAP_MEMBERDN'], '(uid=*)', SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
+                    if result:
+                        db_user_ids = [user.user_id for user in User.query.all()]
+                        db_user_emails = [user.email for user in User.query.all()]
+                        for user in c.response:
+                            if user['attributes']['uid'][0] in db_user_ids:
+                                current_app.logger.debug('{} is already registered.'.format(user['attributes']['uid'][0]))
+                                continue
+                            if user['attributes']['email'][0] in db_user_emails:
+                                current_app.logger.debug('{} is already registered.'.format(user['attributes']['email'][0]))
+                                continue
+                            #LDAPSync.import_user(user)
 
-                        for character in user_model.characters:
-                            if character.name == ldap_user.characterName:
-                                user_model.main_character_id = character.id
-                                break
+    @staticmethod
+    def import_user(user):
+        # Is user already in Db ?
+        password = user['attributes']['userPassword'][0]
+        ldap_user = LDAPUser.from_ldap(user)
 
-                        user_model.api_keys.append(api_key)
-                        db.session.add(user_model)
-                        db.session.flush()
-                        try:
-                            user_model.update_keys()
-                            user_model.update_status()
-                        except Exception as e:
-                            current_app.logger.exception(e)
-                        db.session.add(user_model)
-                        db.session.commit()
-                        current_app.logger.debug('{} has been imported.'.format(ldap_user.uid))
+        user_model = User(
+            user_id=ldap_user.uid,
+            email=ldap_user.email,
+            password=password,
+            name=ldap_user.characterName
+        )
+        api_key = APIKey(
+            key_id=ldap_user.keyID,
+            vcode=ldap_user.vCode
+        )
+        try:
+            api_key.update_api_key()
+            for character in api_key.get_characters():
+                user_model.characters.append(character)
+        except Exception as e:
+            current_app.logger.exception(e)
+            return
+
+        for character in user_model.characters:
+            if character.name == ldap_user.characterName:
+                user_model.main_character_id = character.id
+                break
+
+        user_model.api_keys.append(api_key)
+        db.session.add(user_model)
+        db.session.flush()
+
+        try:
+            user_model.update_keys()
+            user_model.update_status()
+        except Exception as e:
+            current_app.logger.exception(e)
+        db.session.add(user_model)
+        db.session.commit()
+        current_app.logger.debug('{} has been imported.'.format(ldap_user.uid))
+
