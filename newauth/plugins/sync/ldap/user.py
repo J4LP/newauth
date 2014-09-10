@@ -43,15 +43,6 @@ class Field(Attribute):
                 self.default = None
 
     def __set__(self, obj, value):
-        try:
-            self.default
-        except AttributeError:
-            pass
-        else:
-            if value is self.default:
-                del obj[self._key]
-                return
-
         if self.required and value in (None, nil):
             raise ValidationError("Required fields can not be empty or omitted.")
 
