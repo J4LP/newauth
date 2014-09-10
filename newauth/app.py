@@ -27,7 +27,7 @@ def create_app():
     app.loaded_plugins = {}
     app.admin_user_hooks = []
     app.dashboard_hooks = []
-    app.navbar = {'admin': []}
+    app.navbar = {'admin': [], 'extra': []}
 
     for plugin in app.config['PLUGINS']:
         imported_plugin = import_string(plugin)()
