@@ -27,6 +27,10 @@ class PingsView(FlaskView):
 
     @route('new/', methods=['GET', 'POST'])
     def new(self):
+
+        current_user_admin = current_user.is_admin()
+        current_user_ping = current_user.can_ping()
+
         categories = PingCategory.query.all()
         ping_form = PingForm()
         if ping_form.validate_on_submit():
@@ -41,9 +45,6 @@ class PingsView(FlaskView):
                 scopes.append('Internal')
             if ping_form.ally.data:
                 scopes.append('Ally')
-
-            current_user_admin = current_user.is_admin()
-            current_user_ping = current_user.can_ping()
 
             if scopes and not current_user_admin and not current_user_ping:
                 flash("You are not allowed to Ping to this scope.", 'danger')
