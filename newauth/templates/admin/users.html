@@ -11,6 +11,33 @@
         <hr/>
     </div>
     <div class="col-md-12">
+        <form class="form-inline" action="{{ url_for('AdminView:users') }}">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control input-sm" value="{{ name if name else '' }}">
+            </div>
+            <div class="form-group">
+                <label for="corporation">Corporation</label>
+                <input type="text" name="corporation" class="form-control input-sm" value="{{ corporation if corporation else '' }}">
+            </div>
+            <div class="form-group">
+                <label for="alliance">Alliance</label>
+                <input type="text" name="alliance" class="form-control input-sm" value="{{ alliance if alliance else '' }}">
+            </div>
+            <div class="form-group">
+                <label for="alliance">Status</label>
+                <select class="form-control input-sm" name="status" id="status">
+                    <option value="any">Any</option>
+                    {% for elem in CharacterStatus %}
+                    <option value="{{ elem.name }}" {% if status == elem.name %}selected{% endif %}>{{ elem.value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary btn-sm" type="submit"><i class="fa fa-fw fa-filter"></i> Filter</button>
+            </div>
+            <hr>
+        </form>
         <table class="table table-hover">
             <thead>
                 <tr>

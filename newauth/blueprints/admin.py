@@ -4,7 +4,7 @@ from flask.ext.classy import FlaskView, route
 from flask.ext.sqlalchemy import Pagination
 from newauth.eveapi import AuthenticationException
 from newauth.forms import AccountAdminUpdateForm, APIKeyForm
-from newauth.models import User, db, APIKey
+from newauth.models import User, db, APIKey, Character
 from newauth.models.enums import CharacterStatus
 from newauth.utils import flash_errors, is_admin
 
@@ -15,8 +15,25 @@ class AdminView(FlaskView):
 
     def users(self):
         page = int(request.args.get('page', 1))
-        users = User.query.paginate(page)
-        return render_template('admin/users.html', users=users)
+        users = User.query
+        if request.args.get('name'):
+            users = users.filter(User.name.ilike('%' + request.args.get('name') + '%'))
+        if request.args.get('corporation'):
+            users = users.filter(User.main_character.has(Character.corporation_name.ilike('%' + request.args.get('corporation') + '%')))
+        if request.args.get('alliance'):
+            users = users.filter(User.main_character.has(Character.alliance_name.ilike('%' + request.args.get('alliance') + '%')))
+        if request.args.get('status'):
+            if request.args.get('status') != 'any':
+                users = users.filter(User.status == CharacterStatus[request.args.get('status')].value)
+        users = users.paginate(page)
+        return render_template(
+            'admin/users.html',
+            users=users,
+            name=request.args.get('name'),
+            corporation=request.args.get('corporation'),
+            alliance=request.args.get('alliance'),
+            status=request.args.get('status'),
+        )
 
     @route('/users/<user_id>', methods=['GET', 'POST'])
     def admin_user(self, user_id):
