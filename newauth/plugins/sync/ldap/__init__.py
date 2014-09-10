@@ -1,7 +1,7 @@
 import random
 import string
 from ldap3 import Server, Connection, AUTH_SIMPLE, STRATEGY_SYNC, SEARCH_SCOPE_WHOLE_SUBTREE, MODIFY_ADD, MODIFY_DELETE, MODIFY_REPLACE, LDAPException
-from flask import current_app
+from flask import current_app, request
 from flask.ext.script import Manager
 from flask.ext.sqlalchemy import models_committed
 from passlib.hash import ldap_salted_sha1
@@ -55,6 +55,10 @@ class LDAPSync(object):
         A handy signal in SQLAlchemy allows LDAPSync to be notified when a model has been modified.
         This function will separate the changes and dispatch them to the correct functions.
         """
+        # Disable signals when sending a ping
+        # Need to look at disconnecting the event and reconnecting it or setting a global lock
+        if request and request.endpoint == 'PingsView:new' and request.method == 'POST':
+            return
         for model, change in changes:
             if isinstance(model, User):
                 if change == 'update':
