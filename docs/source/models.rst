@@ -9,3 +9,5 @@ Models
 
     .. automethod:: update_password
     .. automethod:: check_password
+    .. automethod:: update_status
+    .. automethod:: update_keys
