@@ -68,12 +68,12 @@
         </table>
         <ul class="pagination pull-right">
             {% if users.has_prev %}
-            <li><a href="{{ url_for('AdminsView:user', page=users.prev_num) }}">&laquo;</a></li>
+            <li><a href="{{ url_for('AdminsView:users', page=users.prev_num) }}">&laquo;</a></li>
             {% endif %}
             {%- for page in users.iter_pages() %}
                 {% if page %}
                     {% if page != users.page %}
-                        <li><a href="{{ url_for('AdminsView:user', page=page) }}">{{ page }}</a></li>
+                        <li><a href="{{ url_for('AdminsView:users', page=page) }}">{{ page }}</a></li>
                     {% else %}
                         <li class="active"><a href="#">{{ page }}</a></li>
                     {% endif %}
@@ -82,7 +82,7 @@
                 {% endif %}
             {% endfor %}
             {% if users.has_next %}
-                <li><a href="{{ url_for('AdminsView:user', page=users.next_num) }}">&raquo;</a></li>
+                <li><a href="{{ url_for('AdminsView:users', page=users.next_num) }}">&raquo;</a></li>
             {% endif %}
         </ul>
     </div>
