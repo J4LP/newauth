@@ -35,6 +35,9 @@
                     <dt>Type</dt>
                     <dd>{{ group.type }}</dd>
                 </dl>
+                {% if current_user.is_admin() %}
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-group"><i class="fa fa-trash"></i> Delete group</button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -238,6 +241,42 @@
         {% endif %}
     </div>
 </div>
+{% if current_user.is_admin() %}
+    <div class="modal fade" id="delete-group">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Deleting group</h4>
+                </div>
+                {% call macros.render_form(None, action_url=url_for('GroupsView:delete_group', name=group.name), action_text='<i class="fa fa-trash fa-fw"></i> Yes I am sure!', class_='form-horizontal', btn_class='btn btn-block btn-danger') %}
+                    <input type="hidden" value="{{ csrf_token() }}" name="csrf_token"/>
+                    <div class="modal-body">
+                        You are going to delete this group, are you sure about this?
+                    </div>
+                <div class="modal-footer">
+                {% endcall %}
+                </div>
+            </div>
+        </div>
+    </div><div class="modal fade" id="edit-group">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editing group</h4>
+                </div>
+                {% call macros.render_form(group_edit_form, action_url=url_for('GroupsView:get', name=group.name), action_text='<i class="fa fa-check fa-fw"></i> Submit', class_='form-horizontal', btn_class='btn btn-block btn-success') %}
+                    <div class="modal-body">
+                        {{ macros.render_field(group_edit_form.description, horizontal=True) }}
+                        {{ macros.render_field(group_edit_form.type, horizontal=True) }}
+                        {{ macros.render_checkbox_field(group_edit_form.public_members, horizontal=True) }}
+                    </div>
+                <div class="modal-footer">
+                {% endcall %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 {% if membership.is_admin or current_user.is_admin() %}
 <div class="modal fade" id="edit-group">
     <div class="modal-dialog">

@@ -382,11 +382,29 @@ class GroupsView(FlaskView):
         group = Group.query.filter_by(name=name).first()
         if not group:
             abort(404)
-        if not group.members.filter_by(user_id=current_user.id, is_admin=True).first() and not current_user.is_admin():
+        if not current_user.is_admin():
             abort(403)
         name = request.args.get('name')
         if not name or len(name) < 3:
             abort(400)
         users = User.query.with_entities(User.id, User.name).filter(User.name.ilike('%' + name + '%')).all()[:10]
         return jsonify(results=[{'id': u[0], 'name': u[1]} for u in users])
+
+    @route('<name>/admin/delete', methods=['POST'])
+    def delete_group(self, name):
+        group = Group.query.filter_by(name=name).first()
+        if not group:
+            abort(404)
+        if not current_user.is_admin():
+            abort(403)
+        if group.name in (current_app.config['ADMIN_GROUP'], current_app.config['PING_GROUP']):
+            flash('You can\'t delete this group', 'danger')
+            return redirect(url_for('GroupsView:index'))
+        for membership in group.members.all():
+            db.session.delete(membership)
+        db.session.flush()
+        db.session.delete(group)
+        db.session.commit()
+        flash('Group deleted with success, changes are being propagated.', 'success')
+        return redirect(url_for('GroupsView:index'))
 
