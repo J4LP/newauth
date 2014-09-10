@@ -141,6 +141,8 @@ class EveAPIQuery(object):
             req = self.session.get(self.base + call + '.xml.aspx', params=kwargs)
             req.raise_for_status()
         except requests.exceptions.RequestException as e:
+            if req.status_code == requests.codes['forbidden']:
+                raise AuthenticationException(self.key_id)
             raise e
         if req.status_code != 200:
             if req.status_code == requests.codes['not_found']:
@@ -169,5 +171,6 @@ class EveAPIQuery(object):
         if len(result) == 1:
             result = getattr(result, result.keys())[0]
         redis.set(cache_key, cPickle.dumps((arrow.get(data.cachedUntil), result), -1))
+        redis.expire(cache_key, 60 * 60 * 6)
         return result
 

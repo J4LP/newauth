@@ -2,6 +2,7 @@ from passlib.hash import bcrypt, ldap_salted_sha1
 from flask import current_app, flash, abort
 from flask.ext.login import current_user
 from newauth.app import newauth_signals
+from newauth.eveapi import AuthenticationException
 from newauth.models import db
 from newauth.models.enums import CharacterStatus, APIKeyStatus, GroupInviteStatus
 
@@ -122,8 +123,13 @@ class User(db.Model):
         from newauth.models import Character
         updated_characters = set()
         for api_key in self.api_keys.all():
-            api_key.update_api_key()
-            api_key.get_characters()
+            try:
+                api_key.update_api_key()
+                api_key.get_characters()
+            except AuthenticationException:
+                api_key.set_status(APIKeyStatus.invalid)
+                db.session.add(api_key)
+                continue
             for character in api_key.characters:
                 updated_characters.add(character.id)
             db.session.add(api_key)

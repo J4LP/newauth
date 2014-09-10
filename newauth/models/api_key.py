@@ -1,5 +1,6 @@
 import datetime
 from flask import current_app
+from newauth.eveapi import AuthenticationException
 from newauth.models import db
 from newauth.models.enums import APIKeyType, APIKeyStatus
 
@@ -78,17 +79,22 @@ class APIKey(db.Model):
         return self.characters
 
     def validate(self, save=True):
-        mask_name = None
-        for name, requirement in current_app.config['EVE']['requirements'].iteritems():
-            if self.mask >= requirement['mask']:
-                mask_name = name
-        if not mask_name:
-            self.set_status(APIKeyStatus.invalid_mask)
+        try:
+            self.update_api_key()
+        except AuthenticationException as e:
+            self.set_status(APIKeyStatus.invalid)
         else:
-            if self.expires != current_app.config['EVE']['requirements'][mask_name]['expires']:
-                self.set_status(APIKeyStatus.invalid_expiration)
+            mask_name = None
+            for name, requirement in current_app.config['EVE']['requirements'].iteritems():
+                if self.mask >= requirement['mask']:
+                    mask_name = name
+            if not mask_name:
+                self.set_status(APIKeyStatus.invalid_mask)
             else:
-                self.set_status(APIKeyStatus.valid)
+                if self.expires != current_app.config['EVE']['requirements'][mask_name]['expires']:
+                    self.set_status(APIKeyStatus.invalid_expiration)
+                else:
+                    self.set_status(APIKeyStatus.valid)
         if save:
             db.session.add(self)
             db.session.commit()
