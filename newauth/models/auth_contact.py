@@ -108,7 +108,7 @@ class AuthContact(db.Model):
                             type=AuthContactType.corporation.value,
                             standing=contact.standing,
                             members=sheet.memberCount,
-                            enabled=False,
+                            enabled=contact.standing >= current_app.config['ALLIES_STANDING'],
                             updated_on=datetime.datetime.utcnow()
                         ))
                 elif contact.contactTypeID in ALLIANCE_TYPES:
@@ -119,7 +119,7 @@ class AuthContact(db.Model):
                     if not alliance:
                         current_app.logger.warning('Could not find alliance #{}'.format(contact.contactID))
                         continue
-                    if alliance.allianceID not in contacts_updated and contact.standing >= current_app.config['ALLIES_STANDING']:
+                    if alliance.allianceID not in contacts_updated:
                         contacts_updated.add(alliance.allianceID)
                         db.session.add(AuthContact.get_or_create(
                             id=alliance.allianceID,
@@ -128,7 +128,7 @@ class AuthContact(db.Model):
                             type=AuthContactType.alliance.value,
                             standing=contact.standing,
                             members=alliance.memberCount,
-                            enabled=False,
+                            enabled=contact.standing >= current_app.config['ALLIES_STANDING'],
                             updated_on=datetime.datetime.utcnow()
                         ))
                 else:
