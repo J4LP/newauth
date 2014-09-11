@@ -20,7 +20,7 @@ class GroupsView(FlaskView):
         if filter == 'pending':
             groups = Group.query.filter((Group.members.any(user_id=current_user.id, is_applying=True)) | (Group.invites.any(recipient_id=current_user.id))).order_by(Group.name).all()
         if not filter or filter == 'all':
-            groups = Group.query.all()
+            groups = Group.query.order_by(Group.name).all()
         if query:
             groups = Group.query.filter(Group.name.ilike('%' + query + '%')).order_by(Group.name).all()
         new_group_form = GroupCreateForm()
