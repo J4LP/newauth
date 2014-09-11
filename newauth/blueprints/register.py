@@ -65,7 +65,6 @@ class RegisterView(FlaskView):
             session.clear()
             flash('Could not fetch Character list: {}'.format(e.message))
             return redirect(url_for('RegisterView:api'))
-        print(acceptable_characters)
         if not acceptable_characters:
             flash('We could not find any acceptable characters for you to register with.', 'danger')
             return redirect(url_for('RegisterView:index'))
