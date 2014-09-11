@@ -95,8 +95,8 @@ class AdminView(FlaskView):
             except Exception as e:
                 flash('Error updating API Key: {}'.format(e.message), 'danger')
                 return redirect(url_for('AdminView:admin_user', user_id=user.user_id))
-            current_user.api_keys.append(api_key)
-            db.session.add(current_user)
+            user.api_keys.append(api_key)
+            db.session.add(user)
             try:
                 db.session.commit()
             except Exception as e:
