@@ -25,7 +25,7 @@ class AdminView(FlaskView):
         if request.args.get('status'):
             if request.args.get('status') != 'any':
                 users = users.filter(User.status == CharacterStatus[request.args.get('status')].value)
-        users = users.paginate(page)
+        users = users.order_by(User.name).paginate(page)
         return render_template(
             'admin/users.html',
             users=users,
