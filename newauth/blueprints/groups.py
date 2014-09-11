@@ -16,14 +16,13 @@ class GroupsView(FlaskView):
         query = request.args.get('query')
         filter = request.args.get('filter')
         if filter == 'member':
-            groups = Group.query.filter(Group.members.any(user_id=current_user.id)).all()
+            groups = Group.query.filter(Group.members.any(user_id=current_user.id)).order_by(Group.name).all()
         if filter == 'pending':
-            groups = Group.query.filter((Group.members.any(user_id=current_user.id, is_applying=True)) | (Group.invites.any(recipient_id=current_user.id))).all()
+            groups = Group.query.filter((Group.members.any(user_id=current_user.id, is_applying=True)) | (Group.invites.any(recipient_id=current_user.id))).order_by(Group.name).all()
         if not filter or filter == 'all':
             groups = Group.query.all()
         if query:
-            groups = Group.query.filter(Group.name.ilike('%' + query + '%')).all()
-            print(groups)
+            groups = Group.query.filter(Group.name.ilike('%' + query + '%')).order_by(Group.name).all()
         new_group_form = GroupCreateForm()
         new_group_form.type.choices = [(element.name, element.value) for element in list(GroupType)]
         return render_template('groups/index.html', groups=groups, new_group_form=new_group_form, query=query)
