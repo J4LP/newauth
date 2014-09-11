@@ -164,6 +164,10 @@ class AccountView(FlaskView):
                 User.login_success.send(current_app._get_current_object(), user=user)
                 db.session.add(user)
                 db.session.commit()
+                if not user.main_character:
+                    # It can happens
+                    flash('You were able to login but we could not find a valid main character. Please update your account.', 'warning')
+                    return redirect(url_for('AccountView:profile'))
                 flash('Welcome back {}!'.format(user.main_character.name))
                 return redirect(url_for('AccountView:index'))
             else:
