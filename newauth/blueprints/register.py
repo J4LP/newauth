@@ -51,18 +51,21 @@ class RegisterView(FlaskView):
         except KeyError:
             flash('No API Key found in session.', 'danger')
             return redirect(url_for('RegisterView:index'))
+
         api_key = APIKey(key_id=key_id, vcode=vcode)
         try:
-            api_key.get_characters()
+            api_key.update_api_key()
+            acceptable_characters = set()
+            for character in api_key.get_characters():
+                status = character.get_status()
+                if status == CharacterStatus.internal or status == CharacterStatus.ally:
+                    acceptable_characters.add(character)
         except Exception as e:
             current_app.logger.exception(e)
+            session.clear()
             flash('Could not fetch Character list: {}'.format(e.message))
             return redirect(url_for('RegisterView:api'))
-        acceptable_characters = set()
-        for character in api_key.characters:
-            status = character.get_status()
-            if status == CharacterStatus.internal or status == CharacterStatus.ally:
-                acceptable_characters.add(character)
+        print(acceptable_characters)
         if not acceptable_characters:
             flash('We could not find any acceptable characters for you to register with.', 'danger')
             return redirect(url_for('RegisterView:index'))
