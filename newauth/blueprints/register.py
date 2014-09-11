@@ -4,7 +4,7 @@ from slugify import slugify
 from newauth.eveapi import AuthenticationException
 from newauth.forms import APIKeyForm, RegisterForm
 from newauth.models import APIKey, User, db
-from newauth.models.enums import CharacterStatus
+from newauth.models.enums import CharacterStatus, APIKeyStatus
 
 
 class RegisterView(FlaskView):
@@ -30,10 +30,14 @@ class RegisterView(FlaskView):
                 flash('Error updating API Key: {}'.format(e.message), 'danger')
                 return redirect(url_for('RegisterView:api', type=registration_type))
             else:
-                if api_key.mask != current_app.config['EVE']['requirements'][registration_type]['mask']:
-                    flash('Wrong mask for API Key, needed {}, got {}'.format(current_app.config['EVE']['requirements'][registration_type]['mask'], api_key.mask), 'danger')
+                api_key.validate(save=False)
+                if api_key.get_status() == APIKeyStatus.invalid:
+                    flash('Invalid API Key', 'danger')
                     return redirect(url_for('RegisterView:api', type=registration_type))
-                if current_app.config['EVE']['requirements'][registration_type]['expires'] and not api_key.mask:
+                elif api_key.get_status() == APIKeyStatus.invalid_mask:
+                    flash('Wrong mask for API Key, needed {} or better, got {}'.format(current_app.config['EVE']['requirements'][registration_type]['mask'], api_key.mask), 'danger')
+                    return redirect(url_for('RegisterView:api', type=registration_type))
+                elif api_key.get_status() == APIKeyStatus.invalid_expiration:
                     flash('API Key should not have an expiration set. Please create another API Key.', 'danger')
                     return redirect(url_for('RegisterView:api', type=registration_type))
                 flash('API Key accepted.', 'success')
