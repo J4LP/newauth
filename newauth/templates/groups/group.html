@@ -198,7 +198,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for member in group.members.filter_by(applying=False).all() %}
+                    {% for member in group.members.filter_by(is_applying=False).all() %}
                         <tr>
                             <td>{{ member.user.main_character.name }}</td>
                             <td>{{ member.user.main_character.corporation_name }}</td>
