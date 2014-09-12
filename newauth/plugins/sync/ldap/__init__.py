@@ -1,7 +1,8 @@
+from pkg_resources import resource_string
 import random
 import string
 from ldap3 import Server, Connection, AUTH_SIMPLE, STRATEGY_SYNC, SEARCH_SCOPE_WHOLE_SUBTREE, MODIFY_ADD, MODIFY_DELETE, MODIFY_REPLACE, LDAPException
-from flask import current_app, request
+from flask import current_app, request, render_template_string
 from flask.ext.script import Manager
 from flask.ext.sqlalchemy import models_committed
 from passlib.hash import ldap_salted_sha1
@@ -9,6 +10,8 @@ from slugify import slugify
 from sqlalchemy.orm import make_transient
 from newauth.models import User, Group, GroupMembership, db, APIKey
 from newauth.plugins.sync.ldap.user import LDAPUser
+
+admin_user_hook_template = resource_string(__name__, 'templates/admin_user_hook.html')
 
 
 class LDAPSync(object):
@@ -39,6 +42,12 @@ class LDAPSync(object):
         models_committed.connect_via(app)(self.handle_commit)
         User.new_user.connect_via(app)(self.insert_user)
         User.password_updated.connect_via(app)(self.update_user_password)
+
+        # Registering template hooks
+        if not hasattr(app, 'admin_user_hooks'):
+            app.admin_user_hooks = [self.admin_user_hook]
+        else:
+            app.admin_user_hooks.append(self.admin_user_hook)
 
     def setup_connection(self):
         self.server = Server(self.app.config['SYNC_LDAP_HOST'], port=self.app.config['SYNC_LDAP_PORT'])
@@ -204,3 +213,12 @@ class LDAPSync(object):
         db.session.commit()
         current_app.logger.debug('{} has been imported.'.format(ldap_user.uid))
 
+    def admin_user_hook(self, user):
+        profile = 'Not found.'
+        with self.connection as c:
+            result = c.search(self.app.config['SYNC_LDAP_MEMBERDN'], '(uid={})'.format(user.user_id), SEARCH_SCOPE_WHOLE_SUBTREE, attributes=['*'])
+            if result:
+                if len(c.response) > 1:
+                    profile = 'More than one users found.'
+                profile = c.response_to_ldif(c.response)
+        return render_template_string(admin_user_hook_template, profile=profile)

@@ -106,7 +106,7 @@
     <form method="POST" action="{{ action_url }}" role="form" class="{{ class_ }}">
         {{ form.hidden_tag() if form.hidden_tag }}
         {% if caller %}
-            {{ caller() }}
+            {{ caller()|safe }}
         {% else %}
             {% for f in form %}
                 {% if f.type == 'BooleanField' %}
