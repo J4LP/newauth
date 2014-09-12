@@ -30,7 +30,7 @@
                     <dd>{{ group.created_on|format_datetime }}</dd>
                     {% if group.public_members or membership.is_admin %}
                         <dt>Members</dt>
-                        <dd>{{ group.members.count() }} {{ 'member'|pluralize(group.members.count()) }}</dd>
+                        <dd>{{ group.members.filter_by(is_applying=False).count() }} {{ 'member'|pluralize(group.members.filter_by(is_applying=False).count()) }}</dd>
                     {% endif %}
                     <dt>Type</dt>
                     <dd>{{ group.type }}</dd>
