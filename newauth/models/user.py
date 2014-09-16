@@ -123,6 +123,10 @@ class User(db.Model):
         from newauth.models import Character
         updated_characters = set()
         for api_key in self.api_keys.all():
+            api_key.validate()
+            if api_key.get_status() != APIKeyStatus.valid:
+                # Not updating invalid keys
+                continue
             try:
                 api_key.update_api_key()
                 api_key.get_characters()
