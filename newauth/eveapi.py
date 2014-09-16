@@ -137,11 +137,12 @@ class EveAPIQuery(object):
             cached_data = cPickle.loads(cached_data)
             if arrow.utcnow() < cached_data[0]:
                 return cached_data[1]
+        req = None
         try:
             req = self.session.get(self.base + call + '.xml.aspx', params=kwargs)
             req.raise_for_status()
         except requests.exceptions.RequestException as e:
-            if req.status_code == requests.codes['forbidden']:
+            if req and req.status_code == requests.codes['forbidden']:
                 raise AuthenticationException(self.key_id)
             raise e
         if req.status_code != 200:
