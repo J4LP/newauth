@@ -29,7 +29,7 @@ class PingsView(FlaskView):
     def new(self):
 
         current_user_admin = current_user.is_admin()
-        current_user_ping = current_user.can_ping()
+        current_user_ping = bool(Group.query.filter_by(name=current_app.config['PING_GROUP']).first().members.filter_by(user_id=current_user.id, is_applying=False).first())
 
         categories = PingCategory.query.all()
         ping_form = PingForm()
