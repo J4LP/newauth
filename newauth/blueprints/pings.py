@@ -46,7 +46,7 @@ class PingsView(FlaskView):
             if ping_form.ally.data:
                 scopes.append('Ally')
 
-            if scopes and (not current_user_admin or not current_user_ping):
+            if scopes and (not current_user_admin and not current_user_ping):
                 flash("You are not allowed to Ping to this scope.", 'danger')
                 return redirect(url_for('PingsView:new'))
 
