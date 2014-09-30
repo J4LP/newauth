@@ -17,7 +17,7 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Status</label>
                         <div class="col-sm-9">
-                            <p class="form-control-static">{{ current_user.get_status().value }}</p>
+                            <p class="form-control-static">{{ user.get_status().value }}</p>
                         </div>
                     </div>
                 </div>
@@ -41,6 +41,17 @@
                 </div>
             </div>
         </div>
+        {% if current_user.id != user.id %}
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-sm-9 col-sm-offset-3">
+                        <button class="btn btn-block btn-danger" type="submit" name="delete" value="true"><i class="fa fa-trash fa-fw"></i> Delete user</button>
+                        <p class="help-block"><i class="fa fa-warning fa-fw"></i> Only use if there is no any other way to fix this user. Services tied in NewAuth might not delete the user themselves.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
     {% endcall %}
     <div class="account-profile-characters col-md-12">
         <h3><i class="fa fa-fw fa-users"></i> Characters and Keys {% call macros.render_form(None, action_url=url_for('AdminView:update_user', user_id=user.user_id), class_="form-inline", btn_class="pull-right btn btn-info", action_text='<i class="fa fa-refresh fa-fw"></i> Update characters') %}

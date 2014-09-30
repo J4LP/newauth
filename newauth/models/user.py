@@ -31,6 +31,7 @@ class User(db.Model):
 
     password_updated = newauth_signals.signal('user-updated-password')
     new_user = newauth_signals.signal('user-new')
+    deletion = newauth_signals.signal('user-deletion')
     login_success = newauth_signals.signal('user-login-success')
     login_fail = newauth_signals.signal('user-login-fail')
 

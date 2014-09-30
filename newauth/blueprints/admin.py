@@ -40,6 +40,42 @@ class AdminView(FlaskView):
         user = User.query.filter_by(user_id=user_id).first()
         if not user:
             abort(404)
+        if request.form.get('delete', None) == 'true' and current_user != user:
+            # Deleting group membership
+            for membership in user.groups.all():
+                db.session.delete(membership)
+            db.session.flush()
+            # Deleting characters
+            for character in user.characters.all():
+                db.session.delete(character)
+            db.session.flush()
+            # Deleting keys
+            for api_key in user.api_keys.all():
+                db.session.delete(api_key)
+            db.session.flush()
+            try:
+                db.session.commit()
+            except Exception as e:
+                current_app.logger.exception(e)
+                db.session.rollback()
+                flash('There was an issue deleting user\'s relations', 'danger')
+                return redirect(url_for('AdminView:users'))
+            db.session.delete(user)
+            try:
+                User.deletion.send(current_app._get_current_object(), user_id=user.user_id)
+            except Exception as e:
+                current_app.logger.exception(e)
+                flash('There was an issue during the propagation of the deletion (LDAP, etc...)', 'danger')
+            else:
+                try:
+                    db.session.commit()
+                except Exception as e:
+                    current_app.logger.exception(e)
+                    db.session.rollback()
+                    flash('We could not delete the user from NewAuth database.', 'danger')
+                else:
+                    flash('User deleted with success', 'success')
+            return redirect(url_for('AdminView:users'))
         account_admin_form = AccountAdminUpdateForm(obj=user)
         account_admin_form.main_character.choices = [(character.id, character.name) for character in user.characters if character.get_status() != CharacterStatus.ineligible]
         if account_admin_form.validate_on_submit():

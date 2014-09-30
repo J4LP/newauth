@@ -42,6 +42,7 @@ class LDAPSync(object):
         models_committed.connect_via(app)(self.handle_commit)
         User.new_user.connect_via(app)(self.insert_user)
         User.password_updated.connect_via(app)(self.update_user_password)
+        User.deletion.connect_via(app)(self.delete_user)
 
         # Registering template hooks
         if not hasattr(app, 'admin_user_hooks'):
@@ -123,14 +124,16 @@ class LDAPSync(object):
         ldap_user.update_with_model(user)
         self.save_user(ldap_user)
 
-    def delete_user(self, model):
-        pass
-
     def update_user_password(self, app, model, password):
         ldap_user = self.get_user(model.user_id)
         with self.connection as c:
             c.modify(ldap_user.dn, {'userPassword': (MODIFY_REPLACE, [ldap_salted_sha1.encrypt(password)])})
             result = c.result
+
+    def delete_user(self, app, user_id):
+        ldap_user = self.get_user(user_id)
+        with self.connection as c:
+            c.delete(ldap_user.dn)
 
     ExtraCommands = Manager(usage='Perform tasks related to LDAP')
     ExtraCommands_prefix = 'ldap'

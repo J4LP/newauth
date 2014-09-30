@@ -14,7 +14,7 @@ class GroupMembership(db.Model):
     can_ping = db.Column(db.Boolean, default=False)
     joined_on = db.Column(db.DateTime, default=db.func.now())
 
-    user = db.relationship('User', backref=db.backref('groups', lazy='dynamic'), foreign_keys=[user_id])
+    user = db.relationship('User', backref=db.backref('groups', lazy='dynamic', cascade="all,delete"), foreign_keys=[user_id])
     group = db.relationship('Group', foreign_keys=[group_id])
     accepted_by = db.relationship('User', foreign_keys=[accepted_by_id])
 
