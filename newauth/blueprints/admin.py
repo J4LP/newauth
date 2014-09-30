@@ -41,19 +41,15 @@ class AdminView(FlaskView):
         if not user:
             abort(404)
         if request.form.get('delete', None) == 'true' and current_user != user:
-            # Deleting group membership
-            for membership in user.groups.all():
-                db.session.delete(membership)
-            db.session.flush()
-            # Deleting characters
-            for character in user.characters.all():
-                db.session.delete(character)
-            db.session.flush()
-            # Deleting keys
-            for api_key in user.api_keys.all():
-                db.session.delete(api_key)
-            db.session.flush()
             try:
+                for membership in user.groups.all():
+                    db.session.delete(membership)
+                db.session.flush()
+                for character in user.characters.all():
+                    db.session.delete(character)
+                db.session.flush()
+                for api_key in user.api_keys.all():
+                    db.session.delete(api_key)
                 db.session.commit()
             except Exception as e:
                 current_app.logger.exception(e)
