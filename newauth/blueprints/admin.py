@@ -16,6 +16,8 @@ class AdminView(FlaskView):
     def users(self):
         page = int(request.args.get('page', 1))
         users = User.query
+        if request.args.get('user_id'):
+            users = users.filter(User.user_id.ilike('%' + request.args.get('user_id') + '%'))
         if request.args.get('name'):
             users = users.filter(User.name.ilike('%' + request.args.get('name') + '%'))
         if request.args.get('corporation'):
@@ -29,6 +31,7 @@ class AdminView(FlaskView):
         return render_template(
             'admin/users.html',
             users=users,
+            user_id=request.args.get('user_id'),
             name=request.args.get('name'),
             corporation=request.args.get('corporation'),
             alliance=request.args.get('alliance'),

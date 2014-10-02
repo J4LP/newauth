@@ -13,6 +13,10 @@
     <div class="col-md-12">
         <form class="form-inline" action="{{ url_for('AdminView:users') }}">
             <div class="form-group">
+                <label for="name">User ID</label>
+                <input type="text" name="user_id" class="form-control input-sm" value="{{ user_id if user_id else '' }}">
+            </div>
+            <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" name="name" class="form-control input-sm" value="{{ name if name else '' }}">
             </div>
@@ -34,13 +38,14 @@
                 </select>
             </div>
             <div class="form-group">
-                <button class="btn btn-primary btn-sm" type="submit"><i class="fa fa-fw fa-filter"></i> Filter</button>
+                <button class="btn btn-primary btn-sm" type="submit"><i class="fa fa-fw fa-filter"></i></button>
             </div>
             <hr>
         </form>
         <table class="table table-hover">
             <thead>
                 <tr>
+                    <th>User ID</th>
                     <th>Name</th>
                     <th>Corporation</th>
                     <th>Alliance</th>
@@ -52,6 +57,7 @@
             <tbody>
                 {% for user in users.items %}
                     <tr>
+                        <td>{{ user.user_id }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.main_character.corporation_name }}</td>
                         <td>{{ user.main_character.alliance_name }}</td>
@@ -68,12 +74,12 @@
         </table>
         <ul class="pagination pull-right">
             {% if users.has_prev %}
-            <li><a href="{{ url_for('AdminView:users', page=users.prev_num, name=name, corporation=corporation, alliance=alliance, status=status) }}">&laquo;</a></li>
+            <li><a href="{{ url_for('AdminView:users', page=users.prev_num, user_id=user_id, name=name, corporation=corporation, alliance=alliance, status=status) }}">&laquo;</a></li>
             {% endif %}
             {%- for page in users.iter_pages() %}
                 {% if page %}
                     {% if page != users.page %}
-                        <li><a href="{{ url_for('AdminView:users', page=page, name=name, corporation=corporation, alliance=alliance, status=status) }}">{{ page }}</a></li>
+                        <li><a href="{{ url_for('AdminView:users', page=page, user_id=user_id, name=name, corporation=corporation, alliance=alliance, status=status) }}">{{ page }}</a></li>
                     {% else %}
                         <li class="active"><a href="#">{{ page }}</a></li>
                     {% endif %}
@@ -82,7 +88,7 @@
                 {% endif %}
             {% endfor %}
             {% if users.has_next %}
-                <li><a href="{{ url_for('AdminView:users', page=users.next_num, name=name, corporation=corporation, alliance=alliance, status=status) }}">&raquo;</a></li>
+                <li><a href="{{ url_for('AdminView:users', page=users.next_num, user_id=user_id, name=name, corporation=corporation, alliance=alliance, status=status) }}">&raquo;</a></li>
             {% endif %}
         </ul>
     </div>
