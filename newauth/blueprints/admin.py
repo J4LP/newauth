@@ -77,6 +77,7 @@ class AdminView(FlaskView):
             return redirect(url_for('AdminView:users'))
         account_admin_form = AccountAdminUpdateForm(obj=user)
         account_admin_form.main_character.choices = [(character.id, character.name) for character in user.characters if character.get_status() != CharacterStatus.ineligible]
+        account_admin_form.main_character.default = user.main_character_id
         if account_admin_form.validate_on_submit():
             user.email = account_admin_form.email.data
             new_main_character = user.characters.filter_by(id=account_admin_form.main_character.data).first()

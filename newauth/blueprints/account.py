@@ -20,6 +20,7 @@ class AccountView(FlaskView):
     def profile(self):
         account_form = AccountUpdateForm(obj=current_user)
         account_form.main_character.choices = [(character.id, character.name) for character in current_user.characters if character.get_status() != CharacterStatus.ineligible]
+        account_form.main_character.default = current_user.main_character_id
         if account_form.validate_on_submit():
             if account_form.new_password.data and not account_form.password.data:
                 flash('Your password is required to make these changes.', 'danger')
