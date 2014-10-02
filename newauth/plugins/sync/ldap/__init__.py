@@ -2,7 +2,7 @@ from pkg_resources import resource_string
 import random
 import string
 from ldap3 import Server, Connection, AUTH_SIMPLE, STRATEGY_SYNC, SEARCH_SCOPE_WHOLE_SUBTREE, MODIFY_ADD, MODIFY_DELETE, MODIFY_REPLACE, LDAPException
-from flask import current_app, request, render_template_string
+from flask import current_app, request, render_template_string, abort, flash, redirect, url_for
 from flask.ext.script import Manager
 from flask.ext.sqlalchemy import models_committed
 from passlib.hash import ldap_salted_sha1
@@ -50,6 +50,8 @@ class LDAPSync(object):
         else:
             app.admin_user_hooks.append(self.admin_user_hook)
 
+        app.add_url_rule('/admin/<user_id>/ldap_refresh', 'admin_ldap_refresh', self.admin_refresh_ldap)
+
     def setup_connection(self):
         self.server = Server(self.app.config['SYNC_LDAP_HOST'], port=self.app.config['SYNC_LDAP_PORT'])
         self.connection = Connection(
@@ -88,8 +90,8 @@ class LDAPSync(object):
                 resource = c.response[0]
                 return LDAPUser.from_ldap(resource)
 
-    def save_user(self, ldap_user):
-        changes = ldap_user.changes()
+    def save_user(self, ldap_user, force=False):
+        changes = ldap_user.changes(force)
         if changes:
             with self.connection as c:
                 c.modify(ldap_user.dn, changes)
@@ -224,4 +226,13 @@ class LDAPSync(object):
                 if len(c.response) > 1:
                     profile = 'More than one users found.'
                 profile = c.response_to_ldif(c.response)
-        return render_template_string(admin_user_hook_template, profile=profile)
+        return render_template_string(admin_user_hook_template, profile=profile, user=user)
+
+    def admin_refresh_ldap(self, user_id):
+        user = User.query.filter_by(user_id=user_id).first()
+        if not user:
+            abort(404)
+        self.save_user(self.get_user(user.user_id), force=True)
+        flash('LDAP profile refreshed', 'success')
+        return redirect(url_for('AdminView:admin_user', user_id=user_id))
+

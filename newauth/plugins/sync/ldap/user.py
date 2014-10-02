@@ -162,7 +162,7 @@ class LDAPUser(LDAPDocument):
             self.corporation = ''
         self.authGroup = [membership.group.name for membership in model.groups.filter_by(is_applying=False)]
 
-    def changes(self):
+    def changes(self, force=False):
         ldif_changes = {}
         for key in self.__fields__.iterkeys():
             if key == 'dn':
@@ -173,7 +173,7 @@ class LDAPUser(LDAPDocument):
                     ldif_changes[key] = (MODIFY_ADD, value)
                 elif value:
                     ldif_changes[key] = (MODIFY_ADD, [value])
-            elif key in self._original_ldap_attributes and self._original_ldap_attributes[key] != value:
+            elif key in self._original_ldap_attributes and (self._original_ldap_attributes[key] != value or force) and value:
                 if isinstance(value, list):
                     ldif_changes[key] = (MODIFY_REPLACE, value)
                 else:
