@@ -89,6 +89,7 @@ class LDAPUser(LDAPDocument):
 
     LIST_ATTRIBUTES = ('objectClass', 'authGroup',)
     INT_ATTRIBUTES = ('keyID',)
+    REQUIRED_ATTRIBUTES = ('characterName', 'corporation',)
 
     def __init__(self):
         self._original_ldap_attributes = {}
@@ -136,6 +137,9 @@ class LDAPUser(LDAPDocument):
                     elif v:
                         setattr(user, k, v[0])
                         user._original_ldap_attributes[k] = v[0]
+                    else:
+                        setattr(user, k, '')
+                        user._original_ldap_attributes[k] = ''
         return user
 
     def update_with_model(self, model):
@@ -175,6 +179,10 @@ class LDAPUser(LDAPDocument):
                 else:
                     ldif_changes[key] = (MODIFY_REPLACE, [value])
             elif key in self._original_ldap_attributes and not value:
-                ldif_changes[key] = (MODIFY_DELETE, [self._original_ldap_attributes[key]])
+                if key in LDAPUser.REQUIRED_ATTRIBUTES:
+                    # We can't delete this attribute, let's set it as ''
+                    ldif_changes[key] = (MODIFY_REPLACE, [''])
+                else:
+                    ldif_changes[key] = (MODIFY_DELETE, [self._original_ldap_attributes[key]])
         return ldif_changes
 
