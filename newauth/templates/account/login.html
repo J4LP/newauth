@@ -18,7 +18,7 @@
                 {{ macros.render_field(form.password, label_visible=False, placeholder='Password', addon='<i class="fa fa-lock fa-fw"></i>') }}
                 <div class="form-group">
                     <p><a href="{{ url_for('RegisterView:index') }}">Don't already have an account ? Sign up now !</a></p>
-                    <p><a href="#">Having trouble logging in ? Recover your account.</a></p>
+                    <p><a href="{{ url_for('AccountView:recover') }}">Having trouble logging in ? Recover your account.</a></p>
                 </div>
             {% endcall %}
         </div>

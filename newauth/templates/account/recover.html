@@ -1,0 +1,30 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Recover | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="account-login row">
+    <div class="login-header col-md-6 col-md-offset-3">
+        <h1><img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ config.EVE.auth_name }}"/>{{ config.EVE.auth_name }}</h1>
+        <hr/>
+    </div>
+    <div class="login-box col-md-6 col-md-offset-3">
+        <h3>Password forgotten ?</h3>
+        <div class="well">
+            <p>Please give us your email <strong>or</strong> your username and we will send you an email with a link to recover your account.</p>
+            {% call macros.render_form(form, action_url=url_for('AccountView:recover'), action_text='<i class="fa fa-sign-in fa-fw"></i> Recover', class_='register-member-form', btn_class='btn btn-block btn-warning') %}
+                {{ macros.render_field(form.user_id, label_visible=False, placeholder='Username', addon='<i class="fa fa-user fa-fw"></i>') }}
+                <p class="text-left"><strong>OR</strong></p>
+                {{ macros.render_field(form.email, label_visible=False, placeholder='Email', addon='<i class="fa fa-envelope fa-fw"></i>') }}
+                <div class="form-group">
+                    <p><a href="{{ url_for('RegisterView:index') }}">Don't already have an account? Sign up now!</a></p>
+                    <p><a href="{{ url_for('AccountView:login') }}">Your account is fine? Login now!.</a></p>
+                </div>
+            {% endcall %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

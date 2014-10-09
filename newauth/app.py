@@ -1,10 +1,12 @@
 import os
 from blinker import Namespace
 from flask import Flask, redirect, url_for, session, request, flash
+from flask.ext.mail import Mail
 from flask_wtf import CsrfProtect
 from werkzeug.utils import import_string
 
 newauth_signals = Namespace()
+mail = Mail()
 
 def create_app():
     app = Flask(__name__, static_folder='public')
@@ -22,6 +24,7 @@ def create_app():
     migrate.init_app(app, db)
     redis.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
 
     # Initialize NewAuth plugins
     app.loaded_plugins = {}

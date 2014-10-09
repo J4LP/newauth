@@ -1,0 +1,24 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Account Recovery | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="account-login row">
+    <div class="login-header col-md-6 col-md-offset-3">
+        <h1><img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ config.EVE.auth_name }}"/>{{ config.EVE.auth_name }}</h1>
+        <hr/>
+    </div>
+    <div class="login-box col-md-6 col-md-offset-3">
+        <h3>Recovering account</h3>
+        <div class="well">
+            <p>You are going to reset the password for the username <strong>{{ user.user_id }}</strong>:</p>
+            {% call macros.render_form(form, action_url=url_for('AccountView:do_recovery', recover_key=recover_key), action_text='<i class="fa fa-sign-in fa-fw"></i> Recover', class_='register-member-form', btn_class='btn btn-block btn-warning') %}
+                {{ macros.render_field(form.password, label_visible=True, placeholder='New Password') }}
+                {{ macros.render_field(form.confirm_password, label_visible=True, placeholder='Confirm New Password') }}
+            {% endcall %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -48,8 +48,18 @@ class BaseConfig(object):
     #: Runtime configuration for pingers
     PINGERS_SETTINGS = {}
 
-    #: Settings
+    #: Plugins list
     PLUGINS = []
+
+    #: Mail settings for https://pythonhosted.org/flask-mail/
+    MAIL_SERVER = 'localhost'
+    MAIL_PORT = 25
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = False
+    MAIL_DEBUG = os.getenv('DEBUG', False)
+    MAIL_USERNAME = None
+    MAIL_PASSWORD = None
+    MAIL_DEFAULT_SENDER = None
 
 
 class DevConfig(BaseConfig):

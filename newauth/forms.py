@@ -67,3 +67,13 @@ class AccountAdminUpdateForm(Form):
     email = StringField('Email', validators=[DataRequired(), Email()])
     main_character = SelectField('Main Character', coerce=int, validators=[DataRequired()])
     new_password = PasswordField('New Password')
+
+
+class AccountRecoverForm(Form):
+    user_id = StringField('User ID', validators=[])
+    email = StringField('Email', validators=[])
+
+
+class AccountDoRecoveryForm(Form):
+    password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])

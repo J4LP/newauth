@@ -2,9 +2,10 @@ Flask==0.10.1
 Flask-Assets==0.10
 Flask-Classy==0.6.10
 Flask-Login==0.2.11
+Flask-Mail==0.9.1
 Flask-Migrate==1.2.0
 Flask-Redis==0.0.5
-Flask-SQLAlchemy==1.0
+Flask-SQLAlchemy==2.0
 Flask-Script==2.0.5
 Flask-Testing==0.4.2
 Flask-WTF==0.10.0
@@ -18,7 +19,7 @@ Sphinx==1.2.2
 Unidecode==0.04.16
 WTForms==2.0.1
 Werkzeug==0.9.6
-alembic==0.6.6
+alembic==0.6.7
 arrow==0.4.4
 awesome-slugify==1.6
 bcrypt==1.0.2
@@ -40,7 +41,7 @@ psycopg2==2.5.3
 pyasn1==0.1.7
 pycparser==2.10
 python-dateutil==2.2
-python3-ldap==0.9.5.3
+python3-ldap==0.9.5.4
 redis==2.10.3
 regex==2014.08.15
 relaxml==0.1.3
