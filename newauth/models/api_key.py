@@ -86,8 +86,11 @@ class APIKey(db.Model):
         else:
             mask_name = None
             for name, requirement in current_app.config['EVE']['requirements'].iteritems():
-                if requirement['mask'] >= self.mask:
-                    mask_name = name
+                if self.mask >= requirement['mask']:
+                    if mask_name and requirement['mask'] > current_app.config['EVE']['requirements'][mask_name]['mask']:
+                        mask_name = name
+                    elif not mask_name:
+                        mask_name = name
             if not mask_name:
                 self.set_status(APIKeyStatus.invalid_mask)
             else:
