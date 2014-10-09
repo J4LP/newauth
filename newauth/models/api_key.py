@@ -41,7 +41,7 @@ class APIKey(db.Model):
             raise e
         self.mask = api_info.accessMask
         if api_info.expires:
-            self.expires_on = api_info.expires
+            self.expires_on = datetime.datetime.strptime(api_info.expires, '%Y-%m-%d %H:%M:%S')
         else:
             self.expires_on = None
         self.set_type(APIKeyType(api_info.type))
@@ -86,7 +86,7 @@ class APIKey(db.Model):
         else:
             mask_name = None
             for name, requirement in current_app.config['EVE']['requirements'].iteritems():
-                if self.mask >= requirement['mask']:
+                if requirement['mask'] >= self.mask:
                     mask_name = name
             if not mask_name:
                 self.set_status(APIKeyStatus.invalid_mask)
