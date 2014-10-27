@@ -101,6 +101,7 @@ class EveAPIQuery(object):
         self.base = base
         self.api_key = None
         self.session = requests.Session()
+        self.session.headers['User-Agent'] = 'NewAuth instance for {}'.format(current_app.config['EVE']['auth_name'])
         if public:
             self.public = True
         if api_key and isinstance(api_key, APIKey):
