@@ -65,3 +65,12 @@ And there you have it! NewAuth is now running on your computer. You are now able
      $ python manage.py make_admin $YOUR_USER_ID
 
 Thanks you for using NewAuth!
+
+Background Tasks
+----------------
+
+NewAuth is using Celery to delegate heavy tasks to the background. You will need to launch it alongside newauth with::
+
+    celery -A newauth.tasks worker
+
+This command should be ran in the root directory of NewAuth.

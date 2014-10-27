@@ -10,6 +10,7 @@ from newauth.app import create_app
 from newauth.models import db, AuthContact, User, Group, GroupMembership, APIKey
 from newauth.models.enums import GroupType
 from newauth.plugins.sync.ldap import LDAPUser
+from newauth.tasks import update_user
 
 app = create_app()
 
@@ -62,28 +63,11 @@ def make_ping(user):
 def update_users(user_id=None):
     with app.app_context():
         if user_id:
-            user = User.query.filter_by(user_id=user_id).first()
-            if not user:
-                current_app.logger.warn('Could not find user #{}'.format(user_id))
-                return
-            user.update_keys()
-            user.update_status()
-            db.session.add(user)
-            db.session.commit()
+            update_user.delay(user_id)
         else:
-            users = User.query.filter_by().all()
-            print('Found {} users.'.format(len(users)))
-            count = len(users)
-            i = 0
-            for user in users:
-                i += 1
-                print('Updating {}'.format(user.user_id))
-                print('{} %'.format((i / count) * 100))
-                user.update_keys()
-                user.update_status()
-                db.session.add(user)
-                db.session.commit()
-                time.sleep(1)
+            user_ids = [a[0] for a in db.session.query(User.user_id).all()]
+            for user_id in user_ids:
+                update_user.delay(user_id)
 
 
 if __name__ == '__main__':

@@ -61,6 +61,12 @@ class BaseConfig(object):
     MAIL_PASSWORD = None
     MAIL_DEFAULT_SENDER = None
 
+    #: Celery Settings, more available http://celery.readthedocs.org/en/latest/configuration.html
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = 'db+sqlite:///celery.sqlite'
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+
 
 class DevConfig(BaseConfig):
     SQLALCHEMY_ECHO = False

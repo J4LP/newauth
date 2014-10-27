@@ -1,7 +1,6 @@
 from flask import render_template, redirect, url_for, flash, current_app, request, session, abort, jsonify
 from flask.ext.login import current_user, login_user, login_required
 from flask.ext.classy import FlaskView, route
-from flask.ext.sqlalchemy import Pagination
 from newauth.eveapi import AuthenticationException
 from newauth.forms import AccountAdminUpdateForm, APIKeyForm
 from newauth.models import User, db, APIKey, Character
@@ -194,4 +193,3 @@ class AdminView(FlaskView):
         db.session.commit()
         flash("API Key deleted.", 'success')
         return redirect(url_for('AdminView:admin_user', user_id=user.user_id))
-

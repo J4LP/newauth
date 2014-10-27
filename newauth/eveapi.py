@@ -142,7 +142,7 @@ class EveAPIQuery(object):
             req = self.session.get(self.base + call + '.xml.aspx', params=kwargs)
             req.raise_for_status()
         except requests.exceptions.RequestException as e:
-            if req and req.status_code == requests.codes['forbidden']:
+            if req.status_code == 403:
                 raise AuthenticationException(self.key_id)
             raise e
         if req.status_code != 200:

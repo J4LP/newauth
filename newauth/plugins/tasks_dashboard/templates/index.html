@@ -1,0 +1,48 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Tasks | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="account-tasks row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-tasks fa-fw"></i> Tasks</h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Task name</th>
+                    <th>Args</th>
+                    <th>Status</th>
+                    <th>Result</th>
+                    <th>Date received</th>
+                    <th>Date done</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks|sort(attribute='succeeded', reverse=True) %}
+                <tr>
+                    <td>{{ task.name }}</td>
+                    <td>{{ task.args }}</td>
+                    {% if task.state == 'SUCCESS' %}
+                        <td><span class="label label-success">Success</span></td>
+                    {% elif task.state == 'FAILURE' %}
+                        <td><span class="label label-danger">Failed</span></td>
+                    {% else %}
+                        <td><span class="label label-default">{{ task.state }}</span></td>
+                    {% endif %}
+                    <td>{{ task.result }}</td>
+                    <td>{{ task.received|format_datetime }}</td>
+                    <td>{{ task.succeeded|format_datetime }}</td>
+                    <td class="text-right"><a class="btn btn-xs btn-info" href="{{ url_for('TasksView:get', task_id=task.uuid) }}"><i class="fa fa-fw fa-info-circle"></i> Details</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

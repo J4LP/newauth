@@ -1,5 +1,6 @@
 import os
 from blinker import Namespace
+from celery import Celery
 from flask import Flask, redirect, url_for, session, request, flash
 from flask.ext.mail import Mail
 from flask_wtf import CsrfProtect
@@ -7,6 +8,22 @@ from werkzeug.utils import import_string
 
 newauth_signals = Namespace()
 mail = Mail()
+
+def create_celery(app=None):
+    app = app or create_app()
+    celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
 
 def create_app():
     app = Flask(__name__, static_folder='public')

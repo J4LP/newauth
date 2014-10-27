@@ -35,6 +35,35 @@ The prefix will be read from `NEWAUTH_ENV` and default to "Dev".
    .. autoattribute:: PLUGINS
        :annotation:
 
+.. _mail_settings:
+
+Mail Settings
+-------------
+
+::
+
+    #: Mail settings for https://pythonhosted.org/flask-mail/
+    MAIL_SERVER = 'localhost'
+    MAIL_PORT = 25
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = False
+    MAIL_DEBUG = os.getenv('DEBUG', False)
+    MAIL_USERNAME = None
+    MAIL_PASSWORD = None
+    MAIL_DEFAULT_SENDER = None
+
+.. _celery_settings:
+
+Celery Settings
+---------------
+
+::
+
+    #: Celery Settings, more available http://celery.readthedocs.org/en/latest/configuration.html
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = 'db+sqlite:///celery.sqlite'
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
 
 .. _eve_settings:
 

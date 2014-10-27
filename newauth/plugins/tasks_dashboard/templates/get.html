@@ -1,0 +1,71 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Tasks | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="account-tasks row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-tasks fa-fw"></i> Task info</h1>
+        <hr/>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-turquoise">
+            <div class="panel-heading">
+                <h3 class="panel-title">Task {{ task.name }} {{ task.uuid }}</h3>
+            </div>
+            <table class="table">
+                <tr>
+                    <td>Name</td>
+                    <td>{{ task.name }}</td>
+                </tr>
+                <tr>
+                    <td>UUID</td>
+                    <td>{{ task['task-id'] }}</td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td>{{ task.state }}</td>
+                </tr>
+                <tr>
+                    <td>Args</td>
+                    <td>{{ task.args }}</td>
+                </tr>
+                <tr>
+                    <td>Kwargs</td>
+                    <td>{{ task.kwargs }}</td>
+                </tr>
+                <tr>
+                    <td>Result</td>
+                    <td>{{ task.result }}</td>
+                </tr>
+                <tr>
+                    <td>Received</td>
+                    <td>{{ task.received|format_datetime }}</td>
+                </tr>
+                <tr>
+                    <td>Started</td>
+                    <td>{{ task.started|format_datetime }}</td>
+                </tr>
+                <tr>
+                    <td>Succeeded</td>
+                    <td>{{ task.succeeded|format_datetime }}</td>
+                </tr>
+                <tr>
+                    <td>Retries</td>
+                    <td>{{ task.retries }}</td>
+                </tr>
+                <tr>
+                    <td>Worker</td>
+                    <td>{{ task.worker }}</td>
+                </tr>
+                <tr>
+                    <td>Runtime</td>
+                    <td>{{ task.runtime }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

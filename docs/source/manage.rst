@@ -35,3 +35,11 @@ Description
 Usage
     $ python manage.py make_ping $USER_ID
 
+Update Users
+------------
+
+Description
+    Update one user or all users with Celery
+
+Usage
+    $ python manage.py update_users [user_id]

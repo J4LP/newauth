@@ -94,3 +94,35 @@ Management commands
     python manage.py ldap import_users [--user_id $USER_ID]
 
 This command will import all users in `SYNC_LDAP_MEMBERDN`. We recommend making a backup of your LDAP server before though. If you include add `--user_id` it will only import this user.
+
+
+.. _tasks_dashboard:
+
+Tasks Dashboard
+---------------
+
+NewAuth is using Celery to leverage some heavy tasks to the background, by default, no dashboard is available because it requires an external dependency. If you so wish, you can get a basic dashboard available to your admin and a better more functional one for your IT team. More information about Flower can be found `here`_.
+
+Requirements
+^^^^^^^^^^^^
+
+This plugin requires you to install Flower, a Celery dashboard providing a REST API.
+
+::
+
+    pip install flower
+
+We also need to run Flower alongside NewAuth and Celery with::
+
+    celery -A newauth.tasks flower --address=127.0.0.1 --port=5555
+
+Configuration
+^^^^^^^^^^^^^
+
+To enable `Tasks Dashboard`, add `newauth.plugins.tasks_dashboard.TasksDasboard` to the `PLUGINS` setting.
+
+This plugin only requires one setting::
+
+    CELERY_FLOWER_URL = 'http://127.0.0.1:5555/  # Note the trailing slash
+
+.. _here: http://flower.readthedocs.org/en/latest/index.html
