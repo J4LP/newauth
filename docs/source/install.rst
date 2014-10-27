@@ -71,6 +71,6 @@ Background Tasks
 
 NewAuth is using Celery to delegate heavy tasks to the background. You will need to launch it alongside newauth with::
 
-    celery -A newauth.tasks worker
+    celery -A newauth.tasks worker -Q newauth,celery
 
 This command should be ran in the root directory of NewAuth.

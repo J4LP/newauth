@@ -8,7 +8,7 @@ celery = create_celery()
 logger = get_task_logger(__name__)
 
 
-@celery.task(bind=True, default_retry_delay=30 * 60)
+@celery.task(bind=True, default_retry_delay=30 * 60, rate_limit='1/s')
 def update_user(self, user_id):
     user = User.query.filter_by(user_id=user_id).first()
     if not user:
@@ -26,6 +26,4 @@ def update_user(self, user_id):
         self.retry(exc=e)
     db.session.add(user)
     db.session.commit()
-    # Artifically limit ourselves for CCP. Will need a better solution
-    time.sleep(1)
     return user.status

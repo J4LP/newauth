@@ -67,7 +67,7 @@ def update_users(user_id=None):
         else:
             user_ids = [a[0] for a in db.session.query(User.user_id).all()]
             for user_id in user_ids:
-                update_user.delay(user_id)
+                update_user.apply_async(args=[user_id], queue='newauth')
 
 
 if __name__ == '__main__':
