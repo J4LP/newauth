@@ -80,7 +80,21 @@ class RegisterView(FlaskView):
 
     @route('password', methods=['GET', 'POST'])
     def password(self):
-        character_id = session['character']
+        character_id = request.args.get('character_id', None)
+        
+        if character_id is None and 'character' in session:
+            character_id = session['character']
+        elif character_id:
+            try:
+                character_id = int(character_id)
+                session['character'] = character_id
+            except ValueError:
+                flash('Invalid Character ID, aborting', 'danger')
+                return redirect(url_for('RegisterView:index'))
+        else:
+            flash('Character ID not found, aborting.', 'danger')
+            return redirect(url_for('RegisterView:index'))
+
         key_id = session['key_id']
         vcode = session['vcode']
         api_key = APIKey(key_id=key_id, vcode=vcode)
