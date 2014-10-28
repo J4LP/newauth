@@ -33,9 +33,9 @@
                 {% for character in api_key.characters %}
                     <div class="col-md-4">
                         {% if character.get_status() == CharacterStatus.internal %}
-                            <button class="btn btn-block btn-success">Internal access</button>
+                            <a class="btn btn-block btn-success" href="{{ url_for('RegisterView:password', character_id=character.id) }}">Internal access</a>
                         {% elif character.get_status() == CharacterStatus.ally %}
-                            <button class="btn btn-block btn-info">Ally access</button>
+                            <a class="btn btn-block btn-info" href="{{ url_for('RegisterView:password', character_id=character.id) }}">Ally access</a>
                         {% else %}
                             <button class="btn btn-block btn-info" disabled>Ineligible</button>
                         {% endif %}
