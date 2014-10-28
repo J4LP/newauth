@@ -14,6 +14,8 @@ from newauth.tasks import update_user
 
 app = create_app()
 
+from newauth.models import celery
+
 manager = Manager(app)
 manager.add_command('assets', ManageAssets)
 manager.add_command('db', MigrateCommand)

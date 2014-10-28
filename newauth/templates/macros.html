@@ -34,6 +34,9 @@
                 <p class="help-block">{{ e }}</p>
             {% endfor %}
         {% endif %}
+        {% if field.description %}
+            <p class="help-block">{{ field.description|markdown|safe }}</p>
+        {% endif %}
         {% if horizontal %}
         </div>
         {% endif %}
@@ -113,6 +116,7 @@
                     {{ render_checkbox_field(f) }}
                 {% elif f.type == 'RadioField' %}
                     {{ render_radio_field(f) }}
+                {% elif f.type == 'CSRFTokenField' %}
                 {% else %}
                     {{ render_field(f) }}
                 {% endif %}

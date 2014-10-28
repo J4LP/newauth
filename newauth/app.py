@@ -1,7 +1,6 @@
 import os
 from blinker import Namespace
-from celery import Celery
-from flask import Flask, redirect, url_for, session, request, flash
+from flask import Flask, redirect, url_for, session, request, flash, current_app
 from flask.ext.mail import Mail
 from flask_wtf import CsrfProtect
 from werkzeug.utils import import_string
@@ -9,21 +8,6 @@ from werkzeug.utils import import_string
 newauth_signals = Namespace()
 mail = Mail()
 
-def create_celery(app=None):
-    app = app or create_app()
-    celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'])
-    celery.conf.update(app.config)
-    TaskBase = celery.Task
-
-    class ContextTask(TaskBase):
-        abstract = True
-
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
 
 def create_app():
     app = Flask(__name__, static_folder='public')
@@ -35,16 +19,18 @@ def create_app():
 
     app.config.from_object('newauth.settings.{}Config'.format(app.environment))
 
-    from newauth.models import db, migrate, Message, redis, login_manager
+    from newauth.models import db, migrate, Message, redis, login_manager, celery
     from newauth.models.enums import CharacterStatus, GroupType, APIKeyStatus
     db.init_app(app)
     migrate.init_app(app, db)
     redis.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    celery.init_app(app)
 
     # Initialize NewAuth plugins
     app.loaded_plugins = {}
+    app.loaded_pingers = {}
     app.admin_user_hooks = []
     app.dashboard_hooks = []
     app.navbar = {'admin': [], 'extra': []}
@@ -53,6 +39,11 @@ def create_app():
         imported_plugin = import_string(plugin)()
         imported_plugin.init_app(app)
         app.loaded_plugins[plugin] = imported_plugin
+
+    for pinger in app.config['PINGERS']:
+        imported_pinger = import_string(pinger)()
+        imported_pinger.init_app(app)
+        app.loaded_pingers[pinger] = imported_pinger
 
     from newauth.blueprints import AccountView, RegisterView, GroupsView, PingsView, AdminView
     AccountView.register(app)

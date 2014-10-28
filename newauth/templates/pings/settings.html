@@ -12,16 +12,22 @@
         <hr/>
     </div>
     <div class="col-md-12">
-        {% for pinger in pingers %}
+        {% for pinger in pingers.itervalues() %}
         <div class="panel panel-turquoise">
             <div class="panel-heading">
                 <h3 class="panel-title">{{ pinger.display_name }}</h3>
             </div>
             <div class="panel-body">
                 <p>{{ pinger.description|markdown|safe }}</p>
+
+                {% with %}
+                    {% set form = pinger.get_form(configurations[pinger.name]) %}
+                    {% if form %}
+                        {{ macros.render_form(form, action_url=url_for('PingsView:save_settings', pinger_name=pinger.name), action_text='<i class="fa fa-check fa-fw"></i> Submit', btn_class='btn btn-sm btn-primary') }}
+                    {% endif %}
+                {% endwith %}
                 <form class="form-horizontal" action="">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="pinger_name" value="{{ pinger.name }}">
                     {% for setting in pinger.configuration %}
                         <div class="form-group">
                             <label class="col-sm-3 control-label" for="{{ setting[0] }}">{{ setting[1] }}</label>
@@ -35,12 +41,11 @@
             </div>
             <div class="panel-footer clearfix">
                 {% if pinger.immutable %}
-                <div class="btn-group pull-right">
-                    <button class="btn btn-danger"><i class="fa fa-fw fa-times"></i> Disable</button>
-                    <button class="btn btn-success"><i class="fa fa-fw fa-check"></i> Enable</button>
-                </div>
-                {% else %}
                 <span class="pull-right text-muted">This pinger cannot be disabled.</span>
+                {% elif pinger.enabled %}
+                <div class="btn-group pull-right">
+                    <button class="btn btn-sm btn-danger" disabled><i class="fa fa-fw fa-times"></i> Disable</button>
+                </div>
                 {% endif %}
             </div>
         </div>

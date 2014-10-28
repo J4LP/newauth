@@ -1,10 +1,10 @@
+import os
 import time
 from celery.utils.log import get_task_logger
-from newauth.app import create_celery
-from newauth.models import db, User
+from newauth.models import db, User, celery
 from newauth.eveapi import AuthenticationException
 
-celery = create_celery()
+
 logger = get_task_logger(__name__)
 
 

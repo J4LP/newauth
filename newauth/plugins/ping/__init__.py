@@ -1,20 +1,9 @@
+from flask_wtf import Form
+
+
 class Pinger(object):
     """
-    Pinger base class to create a new pinger.
-
-    :param Ping: Ping object
-    """
-
-    ping = ""
-    """Ping object"""
-
-    configuration = []
-    """
-    Extra fields names to add to the User model.
-
-    The description supports Markdown. This will be serialized as JSON and saved per user.
-
-    :var list: (field_name, name, description)
+    Pinger base class to create a new pinger. Works like a plugin.
     """
 
     name = ""
@@ -29,11 +18,27 @@ class Pinger(object):
     immutable = False
     """Can this pinger be disabled ?"""
 
-    def __init__(self, ping=None):
-        """The pinger is given the ping object that contains the user list and ping message."""
-        self.ping = ping
+    def __init__(self, app=None):
+        if app:
+            self.init_app(app)
 
-    def send_ping(self):
+    def init_app(self, app):
+        """
+        Called when the application starts, use to check for settings or register signals
+        :param app:
+        :return:
+        """
+        pass
+
+    def get_form(self, user_config):
+        """
+        Return a WTForm to display on the pinger settings page or None if no configuration needed.
+        :param user_config:
+        :return:
+        """
+        raise NotImplementedError()
+
+    def send_ping(self, ping):
         """
         Send the ping to the users.
         """
@@ -47,33 +52,29 @@ class Pinger(object):
         """
         raise NotImplementedError()
 
-    def enable(self, user, user_configuration):
+    def enable(self, user, configuration, form):
         """
-        Called when enabling the pinger.
-
-        Modify the user profile to save pinger settings and validate settings.
+        Called when enabling the pinger after the form has been validated.
 
         Feel free to flash messages through Flask's flash.
 
-        `user_configuration` will be saved and tied to the user.
+        `configuration` will be serialized, saved and tied to the user.
 
-        :return: Return if the operation was successful or not.
-        :rtype: boolean
+        :return: Return the configuration if successful or False
         """
         raise NotImplementedError()
 
-    def disable(self, user, user_configuration):
+    def disable(self, user, form):
         """
         Called when disabling the pinger.
 
-        Modify the user profile to disable the pinger so that self.enabled returns False.
+        You can do additional steps before NewAuth disable this pinger for the user.
 
         Feel free to flash messages through Flask's flash.
 
-        `user_configuration` will be saved and tied to the user.
+        `configuration` will be serialized, saved and tied to the user.
 
-        :return: Return if the operation was successful or not.
-        :rtype: boolean
+        :return: Return the configuration if successful or False
         """
         raise NotImplementedError()
 

@@ -2,12 +2,14 @@ from flask.ext.login import LoginManager
 from flask.ext.migrate import Migrate
 from flask.ext.redis import Redis
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.celery import Celery
 
 
 db = SQLAlchemy()
 migrate = Migrate()
 redis = Redis()
 login_manager = LoginManager()
+celery = Celery()
 
 from .user import User
 from .message import Message

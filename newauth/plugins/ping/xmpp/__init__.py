@@ -40,9 +40,11 @@ class XMPPPinger(Pinger):
 
     display_name = "Jabber"
 
-    def __init__(self, ping=None):
-        self.ping = ping
-        self.config = current_app.config['PINGERS_SETTINGS']['newauth.XMPPPinger']
+    def __init__(self, app=None):
+        super(XMPPPinger, self).__init__(app)
+
+    def init_app(self, app):
+        self.config = app.config['PINGERS_SETTINGS']['newauth.XMPPPinger']
         self.immutable = self.config.get('immutable', False)
 
     @property
@@ -53,14 +55,17 @@ class XMPPPinger(Pinger):
 * JabberID: {current_user.user_id}@{config[host]}
 """.format(config=self.config, current_user=current_user)
 
-    def send_ping(self):
+    def send_ping(self, ping):
 
         def do_ping(ping, config, users):
             self.AnnounceBot(config['user'] + '@' + config['host'] + '/auth', config['password'], config, ping, users)
 
         executor = futures.ThreadPoolExecutor(max_workers=1)
-        executor.submit(do_ping, self.ping, self.config, self.ping.users.all())
+        executor.submit(do_ping, ping, self.config, ping.users.all())
         executor.shutdown(wait=True)
+
+    def get_form(self, user_config):
+        return None
 
     def enabled(self, user):
         return True
