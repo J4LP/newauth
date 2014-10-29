@@ -1,6 +1,7 @@
 import os
 from blinker import Namespace
 from flask import Flask, redirect, url_for, session, request, flash, current_app
+from flask.ext.login import login_url
 from flask.ext.mail import Mail
 from flask_wtf import CsrfProtect
 from werkzeug.utils import import_string
@@ -87,9 +88,6 @@ def create_app():
             session.clear()
             session['ip'] = request.remote_addr
             flash('Session expired, please login.')
-            return redirect(url_for('AccountView:login'))
-
-
-
+            return redirect(login_url('AccountView:login', next_url=request.url))
 
     return app

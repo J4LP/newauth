@@ -174,7 +174,7 @@ class AccountView(FlaskView):
                     flash('You were able to login but we could not find a valid main character. Please update your account.', 'warning')
                     return redirect(url_for('AccountView:profile'))
                 flash('Welcome back {}!'.format(user.main_character.name))
-                return redirect(url_for('AccountView:index'))
+                return form.redirect('AccountView:index')
             else:
                 if not user.active:
                     flash('Your account is inactive.', 'danger')
@@ -184,7 +184,9 @@ class AccountView(FlaskView):
         return render_template('account/login.html', form=form)
 
     def logout(self):
+        current_ip = session.get('ip')
         session.clear()
+        session['ip'] = current_ip
         flash('You have been logged out.', 'info')
         return redirect(url_for('AccountView:login'))
 
