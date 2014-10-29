@@ -19,33 +19,44 @@
             </div>
             <div class="panel-body">
                 <p>{{ pinger.description|markdown|safe }}</p>
-
-                {% with %}
-                    {% set form = pinger.get_form(configurations[pinger.name]) %}
-                    {% if form %}
-                        {{ macros.render_form(form, action_url=url_for('PingsView:save_settings', pinger_name=pinger.name), action_text='<i class="fa fa-check fa-fw"></i> Submit', btn_class='btn btn-sm btn-primary') }}
-                    {% endif %}
-                {% endwith %}
-                <form class="form-horizontal" action="">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    {% for setting in pinger.configuration %}
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label" for="{{ setting[0] }}">{{ setting[1] }}</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" name="{{ setting[0] }}">
-                                <span class="help-block">{{ setting[2]|markdown|safe }}</span>
+                {% if pinger.enabled(current_user) %}
+                    {% with %}
+                        {% set form = pinger.get_form(configurations[pinger.name]) %}
+                        {% if form %}
+                            {{ macros.render_form(form, action_url=url_for('PingsView:save_settings', pinger_name=pinger.name), action_text='<i class="fa fa-check fa-fw"></i> Submit', btn_class='btn btn-sm btn-primary') }}
+                        {% endif %}
+                    {% endwith %}
+                    <form class="form-horizontal" action="">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% for setting in pinger.configuration %}
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" for="{{ setting[0] }}">{{ setting[1] }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="{{ setting[0] }}">
+                                    <span class="help-block">{{ setting[2]|markdown|safe }}</span>
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                </form>
+                        {% endfor %}
+                    </form>
+                {% endif %}
             </div>
             <div class="panel-footer clearfix">
                 {% if pinger.immutable %}
                 <span class="pull-right text-muted">This pinger cannot be disabled.</span>
-                {% elif pinger.enabled %}
-                <div class="btn-group pull-right">
-                    <button class="btn btn-sm btn-danger" disabled><i class="fa fa-fw fa-times"></i> Disable</button>
-                </div>
+                {% elif pinger.enabled(current_user) %}
+                    <div class="pull-right">
+                        <form action="{{ url_for('PingsView:disable_pinger', pinger_name=pinger.name) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-sm btn-danger" type="submit"><i class="fa fa-fw fa-times"></i> Disable</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="pull-right">
+                        <form action="{{ url_for('PingsView:enable_pinger', pinger_name=pinger.name) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-sm btn-success" type="submit"><i class="fa fa-fw fa-check"></i> Enable</button>
+                        </form>
+                    </div>
                 {% endif %}
             </div>
         </div>

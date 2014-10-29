@@ -155,6 +155,55 @@ class PingsView(FlaskView):
         }
         return render_template('pings/settings.html', configurations=configurations, pingers=current_app.loaded_pingers)
 
+    @route('/settings/<pinger_name>/enable', methods=['POST'])
+    def enable_pinger(self, pinger_name):
+        pinger = next((pinger for pinger in current_app.loaded_pingers.itervalues() if pinger.name == pinger_name), None)
+        if not pinger:
+            flash('Pinger not found or not enabled.', 'danger')
+            return redirect(url_for('PingsView:settings'))
+        configuration = PingerConfiguration.query.filter_by(user=current_user, pinger=pinger.name).first()
+        if not configuration:
+            configuration = PingerConfiguration(user=current_user, pinger=pinger.name)
+        pinger_status = pinger.enable(current_user, configuration.get_config())
+        if pinger_status is False:
+            flash('Error enabling pinger.', 'danger')
+        elif pinger_status is True:
+            configuration.enabled = True
+            db.session.add(configuration)
+            db.session.commit()
+            flash('Pinger {} enabled.'.format(pinger.name))
+        elif 'error' in pinger_status:
+            flash('Error enabling pinger: ' + pinger_status['error'], 'danger')
+        elif pinger_status.get('action') == 'redirect':
+            configuration.enabled = True
+            db.session.add(configuration)
+            db.session.commit()
+            return redirect(pinger_status['url'])
+        else:
+            flash('Unknown enabling pinger: ' + pinger_status['error'], 'danger')
+        return redirect(url_for('PingsView:settings'))
+
+    @route('/settings/<pinger_name>/disable', methods=['POST'])
+    def disable_pinger(self, pinger_name):
+        pinger = next((pinger for pinger in current_app.loaded_pingers.itervalues() if pinger.name == pinger_name), None)
+        if not pinger:
+            flash('Pinger not found or not enabled.', 'danger')
+            return redirect(url_for('PingsView:settings'))
+        configuration = PingerConfiguration.query.filter_by(user=current_user, pinger=pinger.name).first()
+        if not configuration:
+            configuration = PingerConfiguration(user=current_user, pinger=pinger.name)
+        pinger_status = pinger.disable(current_user, configuration.get_config())
+        if pinger_status is False:
+            flash('Error disabling pinger.', 'danger')
+        else:
+            flash('Pinger disabled.', 'success')
+            configuration.enabled = False
+            configuration.set_config(pinger_status)
+            db.session.add(configuration)
+            db.session.commit()
+        return redirect(url_for('PingsView:settings'))
+
+
     @route('/settings/<pinger_name>', methods=['POST'])
     def save_settings(self, pinger_name):
         pinger = next((pinger for pinger in current_app.loaded_pingers.itervalues() if pinger.name == pinger_name), None)
@@ -169,14 +218,13 @@ class PingsView(FlaskView):
             flash('Error saving pinger {}'.format(pinger.name), 'danger')
             flash_errors(pinger.instanced_form)
             return redirect(url_for('PingsView:settings'))
-        config = pinger.enable(current_user, configuration.get_config(), form)
+        config = pinger.save_configuration(current_user, configuration.get_config(), form)
         if config is False:
             return redirect(url_for('PingsView:settings'))
         configuration.set_config(config)
-        configuration.enabled = True
         db.session.add(configuration)
         db.session.commit()
-        flash('Pinger {} enabled.'.format(pinger.name))
+        flash('Pinger {} settings saved.'.format(pinger.name))
         return redirect(url_for('PingsView:settings'))
 
     @route('/history/<int:ping_id>')

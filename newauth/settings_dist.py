@@ -67,6 +67,13 @@ class BaseConfig(object):
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
 
+    #: HTTP scheme (can be http, https, etc...)
+    HTTP_SCHEME = 'http'
+
+    #: Serve name used to generate external urls
+    #: See "More on SERVER_NAME" http://flask.pocoo.org/docs/0.10/config/#builtin-configuration-values
+    SERVER_NAME = 'newauth.local:5002'
+
 
 class DevConfig(BaseConfig):
     SQLALCHEMY_ECHO = False

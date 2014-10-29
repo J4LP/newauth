@@ -52,7 +52,7 @@ class Pinger(object):
         """
         raise NotImplementedError()
 
-    def enable(self, user, configuration, form):
+    def enable(self, user, configuration):
         """
         Called when enabling the pinger after the form has been validated.
 
@@ -60,11 +60,11 @@ class Pinger(object):
 
         `configuration` will be serialized, saved and tied to the user.
 
-        :return: Return the configuration if successful or False
+        :return: Return True, False, or a dict for more action. See :ref:`pingers` for more info.
         """
         raise NotImplementedError()
 
-    def disable(self, user, form):
+    def disable(self, user, configuration):
         """
         Called when disabling the pinger.
 
@@ -78,3 +78,14 @@ class Pinger(object):
         """
         raise NotImplementedError()
 
+    def save_configuration(self, user, configuration, form):
+        """
+        Called when saving the plugin settings and the form has been validated.
+
+        Feel free to flash messages through Flask's flash.
+
+        `configuration` will be serialized, saved and tied to the user.
+
+        :return: Return the configuration if successful or False
+        """
+        raise NotImplementedError()

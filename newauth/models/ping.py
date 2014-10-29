@@ -50,7 +50,7 @@ class Ping(db.Model):
 class PingerConfiguration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pinger = db.Column(db.String, nullable=False)
-    configuration = db.Column(db.Text, default=lambda: dict())
+    configuration = db.Column(db.Text, default="{}")
     enabled = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
