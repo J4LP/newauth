@@ -16,11 +16,27 @@ class PingerForm(Form):
 
 
 class PushbulletPinger(Pinger):
-    """
-    Pushbullet pinger.
+    """Pushbullet pinger.
 
-    You will need to install the pushbullet.py library. After enabling the plugin you will need to migrate NewAuth.
+    After enabling the plugin, you will need to create an application on `Pushbullet <https://www.pushbullet.com/create-client>`_.
 
+    Configuration:
+
+    ============= =============================================
+    Key           Description
+    ============= =============================================
+    client_id     OAuth client ID
+    client_secret OAuth client secret
+    ============= =============================================
+
+    Example::
+
+        PINGERS_SETTINGS = {
+            'newauth.PushbulletPinger': {
+                'client_id': '123',
+                'client_secret': 'sekret',
+            }
+        }
     """
     name = "newauth.PushbulletPinger"
 

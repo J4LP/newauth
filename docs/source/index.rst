@@ -19,6 +19,7 @@ It is easily extensible and we're very much welcoming of new features!
    manage
    models
    plugins
+   pings
 
 
 

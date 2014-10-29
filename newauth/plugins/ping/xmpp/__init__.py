@@ -6,8 +6,7 @@ import sleekxmpp
 
 
 class XMPPPinger(Pinger):
-    """
-    Jabber pinger. Make sure to configure your offline messages settings if you don't want your server to explode.
+    """Jabber pinger. Make sure to configure your offline messages settings if you don't want your server to explode.
 
     You will need to install sleekxmpp and dnspython and modify your settings file.
 
@@ -20,20 +19,19 @@ class XMPPPinger(Pinger):
     immutable Whether users can disable or not xmpp pings.
     username  Username of user allowed to announce
     password  Password of user allowed to announce
+    immutable Whether this plugin can be disabled or not
     ========= =============================================
 
-    Example:
+    Example::
 
-    ```
-    PINGERS_SETTINGS = {
-        'newauth.XMPPPinger': {
-            'host': 'example.com',
-            'user': 'admin',
-            'password': 'admin',
-            'user_id_key': 'user_id'
+        PINGERS_SETTINGS = {
+            'newauth.XMPPPinger': {
+                'host': 'example.com',
+                'user': 'admin',
+                'password': 'admin',
+                'immutable': True
+            }
         }
-    }
-    ```
     """
 
     name = "newauth.XMPPPinger"
@@ -84,5 +82,5 @@ class XMPPPinger(Pinger):
 
         def send_ping(self, event):
             for user in self.users:
-                self.send_message(mto=getattr(user, self.config['user_id_key']) + '@' + self.config['host'], mbody=self.ping.text, mtype='chat')
+                self.send_message(mto=user.user_id + '@' + self.config['host'], mbody=self.ping.text, mtype='chat')
             self.disconnect(wait=True)

@@ -126,23 +126,3 @@ This plugin only requires one setting::
     CELERY_FLOWER_URL = 'http://127.0.0.1:5555/  # Note the trailing slash
 
 .. _here: http://flower.readthedocs.org/en/latest/index.html
-
-.. _pushbullet_pings:
-
-Pushbullet pings
-----------------
-
-NewAuth can send its pings to `Pushbullet`_, a notification web service that has applications for Chrome, Android, iOS and more.
-
-Requirements
-^^^^^^^^^^^^
-
-No requirements are needed for this plugin.
-
-
-Configuration
-^^^^^^^^^^^^^
-
-To enable this pinger, add ``newauth.plugins.ping.pushbullet.PushbulletPinger`` to the `PLUGINS` setting.
-
-.. _Pushbullet: https://pushbullet.com
