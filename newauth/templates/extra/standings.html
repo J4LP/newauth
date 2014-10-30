@@ -100,10 +100,10 @@
     <script>
         $('.js-update-standings').on('click', function(e) {
             $.ajax({
-                url: '{{ url_for('AdminView:standings') }}',
+                url: '{{ url_for('ExtraView:standings') }}',
                 type: 'POST'
             }).always(function() {
-                window.location.href = '{{ url_for('AdminView:standings', updated=True) }}'
+                window.location.href = '{{ url_for('ExtraView:standings', updated=True) }}'
             })
         })
     </script>
