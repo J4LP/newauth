@@ -17,17 +17,23 @@
                 <h3 class="panel-title">Standing -10</h3>
             </div>
             <ul class="list-group">
-                {% for contact in contacts %}
-                    {% if contact.standing == -10 %}
+                <li class="list-group-item disabled"><strong>Alliances</strong></li>
+                {% for contact in contacts['-10']['alliances']|sort(attribute='name') %}
                         <li class="list-group-item">
-                            {% if contact.get_type() == AuthContactType.alliance %}
-                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% else %}
-                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% endif %}
+                            <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
                             {{ contact.name }}
                         </li>
-                    {% endif %}
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No alliances</span></li>
+                {% endfor %}
+                <li class="list-group-item disabled"><strong>Corporations</strong></li>
+                {% for contact in contacts['-10']['corporations']|sort(attribute='name') %}
+                        <li class="list-group-item">
+                            <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {{ contact.name }}
+                        </li>
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No corporations</span></li>
                 {% endfor %}
             </ul>
         </div>
@@ -38,17 +44,23 @@
                 <h3 class="panel-title">Standing -5</h3>
             </div>
             <ul class="list-group">
-                {% for contact in contacts %}
-                    {% if contact.standing == -5 %}
+                <li class="list-group-item disabled"><strong>Alliances</strong></li>
+                {% for contact in contacts['-5']['alliances']|sort(attribute='name') %}
                         <li class="list-group-item">
-                            {% if contact.get_type() == AuthContactType.alliance %}
-                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% else %}
-                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% endif %}
+                            <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
                             {{ contact.name }}
                         </li>
-                    {% endif %}
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No alliances</span></li>
+                {% endfor %}
+                <li class="list-group-item disabled"><strong>Corporations</strong></li>
+                {% for contact in contacts['-5']['corporations']|sort(attribute='name') %}
+                        <li class="list-group-item">
+                            <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {{ contact.name }}
+                        </li>
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No corporations</span></li>
                 {% endfor %}
             </ul>
         </div>
@@ -56,20 +68,26 @@
     <div class="col-md-3">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Standing 5</h3>
+                <h3 class="panel-title">Standing +5</h3>
             </div>
             <ul class="list-group">
-                {% for contact in contacts %}
-                    {% if contact.standing == 5 %}
+                <li class="list-group-item disabled"><strong>Alliances</strong></li>
+                {% for contact in contacts['5']['alliances']|sort(attribute='name') %}
                         <li class="list-group-item">
-                            {% if contact.get_type() == AuthContactType.alliance %}
-                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% else %}
-                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% endif %}
+                            <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
                             {{ contact.name }}
                         </li>
-                    {% endif %}
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No alliances</span></li>
+                {% endfor %}
+                <li class="list-group-item disabled"><strong>Corporations</strong></li>
+                {% for contact in contacts['5']['corporations']|sort(attribute='name') %}
+                        <li class="list-group-item">
+                            <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {{ contact.name }}
+                        </li>
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No corporations</span></li>
                 {% endfor %}
             </ul>
         </div>
@@ -77,20 +95,26 @@
     <div class="col-md-3">
         <div class="panel panel-success">
             <div class="panel-heading">
-                <h3 class="panel-title">Standing 10</h3>
+                <h3 class="panel-title">Standing +10</h3>
             </div>
             <ul class="list-group">
-                {% for contact in contacts %}
-                    {% if contact.standing == 10 %}
+                <li class="list-group-item disabled"><strong>Alliances</strong></li>
+                {% for contact in contacts['10']['alliances']|sort(attribute='name') %}
                         <li class="list-group-item">
-                            {% if contact.get_type() == AuthContactType.alliance %}
-                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% else %}
-                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
-                            {% endif %}
+                            <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
                             {{ contact.name }}
                         </li>
-                    {% endif %}
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No alliances</span></li>
+                {% endfor %}
+                <li class="list-group-item disabled"><strong>Corporations</strong></li>
+                {% for contact in contacts['10']['corporations']|sort(attribute='name') %}
+                        <li class="list-group-item">
+                            <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {{ contact.name }}
+                        </li>
+                {% else %}
+                    <li class="list-group-item"><span class="text-muted">No corporations</span></li>
                 {% endfor %}
             </ul>
         </div>
