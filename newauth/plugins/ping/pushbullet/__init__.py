@@ -93,7 +93,8 @@ class PushbulletPinger(Pinger):
         }
 
     def disable(self, user, configuration):
-        del configuration['access_token']
+        if 'access_token' in configuration:
+            del configuration['access_token']
         return configuration
 
     def save_configuration(self, user, configuration, form):
