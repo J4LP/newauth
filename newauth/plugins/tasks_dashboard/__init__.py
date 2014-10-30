@@ -1,12 +1,9 @@
-import json
-import operator
 from pkg_resources import resource_string
-from flask import current_app, render_template_string, url_for, request, flash, redirect, abort, make_response, jsonify
+from flask import current_app, render_template_string, flash
 from flask.ext.classy import FlaskView, route
-from flask.ext.login import current_user
+from flask.ext.login import login_required
 import requests
-from newauth.eveapi import EveAPIQuery
-from newauth.models import Group, Character
+from newauth.utils import is_admin
 
 
 class TasksDasboard(object):
@@ -27,6 +24,8 @@ class TasksDasboard(object):
         self.app.logger.debug("Tasks Dashboard is enabled.")
 
     class TasksView(FlaskView):
+
+        decorators = [login_required, is_admin]
 
         route_base = '/admin/tasks'
 
