@@ -6,7 +6,7 @@ import requests
 from newauth.utils import is_admin
 
 
-class TasksDasboard(object):
+class TasksDashboard(object):
     """Small tasks dashboard powered by Celery and Flower"""
 
     def __init__(self, app=None):

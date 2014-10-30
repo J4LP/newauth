@@ -119,7 +119,7 @@ We also need to run Flower alongside NewAuth and Celery with::
 Configuration
 ^^^^^^^^^^^^^
 
-To enable `Tasks Dashboard`, add ``newauth.plugins.tasks_dashboard.TasksDasboard`` to the `PLUGINS` setting.
+To enable `Tasks Dashboard`, add ``newauth.plugins.tasks_dashboard.TasksDashboard`` to the `PLUGINS` setting.
 
 This plugin only requires one setting::
 
