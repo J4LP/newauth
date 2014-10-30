@@ -1,0 +1,111 @@
+{% extends "_layouts/base.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}Standings | {{ config.EVE.auth_name }}{% endblock %}
+
+{% block content %}
+<div class="standings row">
+    <div class="col-md-12">
+        <h1><i class="fa fa-fw fa-book"></i> Standings
+            {% if current_user.is_admin() %}<button class="btn btn-primary pull-right js-update-standings"><i class="fa fa-fw fa-refresh"></i> Refresh</button>{% endif %}</h1>
+        <hr/>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title">Standing -10</h3>
+            </div>
+            <ul class="list-group">
+                {% for contact in contacts %}
+                    {% if contact.standing == -10 %}
+                        <li class="list-group-item">
+                            {% if contact.get_type() == AuthContactType.alliance %}
+                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% else %}
+                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% endif %}
+                            {{ contact.name }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">Standing -5</h3>
+            </div>
+            <ul class="list-group">
+                {% for contact in contacts %}
+                    {% if contact.standing == -5 %}
+                        <li class="list-group-item">
+                            {% if contact.get_type() == AuthContactType.alliance %}
+                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% else %}
+                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% endif %}
+                            {{ contact.name }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Standing 5</h3>
+            </div>
+            <ul class="list-group">
+                {% for contact in contacts %}
+                    {% if contact.standing == 5 %}
+                        <li class="list-group-item">
+                            {% if contact.get_type() == AuthContactType.alliance %}
+                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% else %}
+                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% endif %}
+                            {{ contact.name }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">Standing 10</h3>
+            </div>
+            <ul class="list-group">
+                {% for contact in contacts %}
+                    {% if contact.standing == 10 %}
+                        <li class="list-group-item">
+                            {% if contact.get_type() == AuthContactType.alliance %}
+                                <img src="https://image.eveonline.com/Alliance/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% else %}
+                                <img src="https://image.eveonline.com/Corporation/{{ contact.id }}_32.png" class="img-circle" style="margin-right: 5px"/>
+                            {% endif %}
+                            {{ contact.name }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% if current_user.is_admin() %}
+    <script>
+        $('.js-update-standings').on('click', function(e) {
+            $.ajax({
+                url: '{{ url_for('AdminView:standings') }}',
+                type: 'POST'
+            }).always(function() {
+                window.location.href = '{{ url_for('AdminView:standings', updated=True) }}'
+            })
+        })
+    </script>
+{% endif %}
+{% endblock %}

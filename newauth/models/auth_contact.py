@@ -26,6 +26,9 @@ class AuthContact(db.Model):
     added_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now())
 
+    def get_type(self):
+        return AuthContactType(self.type)
+
     @classmethod
     def get_or_create(cls, **kwargs):
         contact = AuthContact.query.filter_by(id=kwargs['id']).first()

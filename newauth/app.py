@@ -21,7 +21,7 @@ def create_app():
     app.config.from_object('newauth.settings.{}Config'.format(app.environment))
 
     from newauth.models import db, migrate, Message, redis, login_manager, celery
-    from newauth.models.enums import CharacterStatus, GroupType, APIKeyStatus
+    from newauth.models.enums import CharacterStatus, GroupType, APIKeyStatus, AuthContactType
     db.init_app(app)
     migrate.init_app(app, db)
     redis.init_app(app)
@@ -46,12 +46,13 @@ def create_app():
         imported_pinger.init_app(app)
         app.loaded_pingers[pinger] = imported_pinger
 
-    from newauth.blueprints import AccountView, RegisterView, GroupsView, PingsView, AdminView
+    from newauth.blueprints import AccountView, RegisterView, GroupsView, PingsView, AdminView, ExtraView
     AccountView.register(app)
     RegisterView.register(app)
     GroupsView.register(app)
     PingsView.register(app)
     AdminView.register(app)
+    ExtraView.register(app)
 
     from newauth.assets import assets_env
     assets_env.init_app(app)
@@ -75,6 +76,7 @@ def create_app():
             'CharacterStatus': CharacterStatus,
             'GroupType': GroupType,
             'APIKeyStatus': APIKeyStatus,
+            'AuthContactType': AuthContactType,
             'hooks': {
                 'admin_user_hooks': app.admin_user_hooks,
                 'dashboard_hooks': app.dashboard_hooks

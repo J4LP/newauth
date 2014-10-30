@@ -1,7 +1,7 @@
 import os
 import time
 from celery.utils.log import get_task_logger
-from newauth.models import db, User, celery
+from newauth.models import db, User, celery, AuthContact
 from newauth.eveapi import AuthenticationException
 
 
@@ -27,3 +27,8 @@ def update_user(self, user_id):
     db.session.add(user)
     db.session.commit()
     return user.status
+
+
+@celery.task
+def update_contacts():
+    AuthContact.update_contacts()
