@@ -74,6 +74,11 @@ class BaseConfig(object):
     #: See "More on SERVER_NAME" http://flask.pocoo.org/docs/0.10/config/#builtin-configuration-values
     SERVER_NAME = 'newauth.local:5002'
 
+    #: Better SQL pool settings
+    SQLALCHEMY_POOL_SIZE = 10
+    SQLALCHEMY_POOL_TIMEOUT = 60
+    SQLALCHEMY_MAX_OVERFLOW = 10
+
 
 class DevConfig(BaseConfig):
     SQLALCHEMY_ECHO = False
