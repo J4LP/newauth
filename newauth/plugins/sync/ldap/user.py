@@ -118,6 +118,7 @@ class LDAPUser(LDAPDocument):
         user.vCode = model.main_character.api_key.vcode
         user.authGroup = [membership.group.name for membership in model.groups.filter_by(is_applying=False)]
         user.dn = 'uid={},{}'.format(model.user_id, current_app.config['SYNC_LDAP_MEMBERDN'])
+        session.close()
         return user
 
     @classmethod
@@ -161,6 +162,7 @@ class LDAPUser(LDAPDocument):
             self.alliance = ''
             self.corporation = ''
         self.authGroup = [membership.group.name for membership in model.groups.filter_by(is_applying=False)]
+        session.close()
 
     def changes(self, force=False):
         ldif_changes = {}

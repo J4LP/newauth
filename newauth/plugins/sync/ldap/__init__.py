@@ -125,6 +125,7 @@ class LDAPSync(object):
         ldap_user = self.get_user(user.user_id)
         ldap_user.update_with_model(user)
         self.save_user(ldap_user)
+        session.close()
 
     def update_user_password(self, app, model, password):
         ldap_user = self.get_user(model.user_id)
