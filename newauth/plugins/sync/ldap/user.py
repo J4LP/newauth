@@ -183,6 +183,10 @@ class LDAPUser(LDAPDocument):
                     # We can't delete this attribute, let's set it as ''
                     ldif_changes[key] = (MODIFY_REPLACE, [''])
                 else:
-                    ldif_changes[key] = (MODIFY_DELETE, [self._original_ldap_attributes[key]])
+                    if isinstance(self._original_ldap_attributes[key], list):
+                        ldif_changes[key] = (MODIFY_DELETE,
+                                             self._original_ldap_attributes[key])
+                    else:
+                        ldif_changes[key] = (MODIFY_DELETE, [self._original_ldap_attributes[key]])
         return ldif_changes
 
