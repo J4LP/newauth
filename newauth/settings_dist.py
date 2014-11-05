@@ -1,5 +1,6 @@
 import datetime
 import os
+from celery.schedules import crontab
 
 
 class BaseConfig(object):
@@ -66,6 +67,16 @@ class BaseConfig(object):
     CELERY_RESULT_BACKEND = 'db+sqlite:///celery.sqlite'
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
+    CELERYBEAT_SCHEDULE = {
+        'update_users': {
+            'task': 'newauth.tasks.update_users',
+            'schedule': crontab(minute=0, hour=13),
+        },
+        'update_contacts': {
+            'task': 'newauth.tasks.update_contacts',
+            'schedule': crontab(minute=0, hour='*/2')
+        }
+    }
 
     #: HTTP scheme (can be http, https, etc...)
     HTTP_SCHEME = 'http'

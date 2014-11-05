@@ -32,3 +32,10 @@ def update_user(self, user_id):
 @celery.task
 def update_contacts():
     AuthContact.update_contacts()
+
+
+@celery.task
+def update_users():
+    user_ids = [a[0] for a in db.session.query(User.user_id).all()]
+    for user_id in user_ids:
+        update_user.apply_async(args=[user_id], queue='newauth')
