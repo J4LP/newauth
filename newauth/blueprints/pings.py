@@ -75,7 +75,8 @@ class PingsView(FlaskView):
             groups_users = set()
             for group in groups:
                 if current_user.can_ping_group(group) or current_user_admin or current_user_ping:
-                    groups_users |= set(membership.user for membership in group.members.all())
+                    groups_users |= set(membership.user for membership in group.members.all()
+                                        if membership.is_applying == False)
                 else:
                     flash("You are not allowed to ping to group '{}'".format(group.name))
                     return redirect(url_for('PingsView:new'))
