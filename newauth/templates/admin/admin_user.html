@@ -55,7 +55,7 @@
     {% endcall %}
     <div class="account-profile-characters col-md-12">
         <h3><i class="fa fa-fw fa-users"></i> Characters and Keys {% call macros.render_form(None, action_url=url_for('AdminView:update_user', user_id=user.user_id), class_="form-inline", btn_class="pull-right btn btn-info", action_text='<i class="fa fa-refresh fa-fw"></i> Update characters') %}
-            <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">{% endcall %}</h3>
+            <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">{% endcall %} <button data-toggle="modal" data-target="#new-key" class="btn btn-success pull-right" style="margin-right: 20px"><i class="fa fa-plus fa-fw"></i> Add API Key</button></h3>
         <hr/>
     </div>
     <div class="col-md-12">
@@ -108,7 +108,7 @@
                 </div>
             </div>
         {% endfor %}
-        <button data-toggle="modal" data-target="#new-key" class="btn btn-success"><i class="fa fa-plus fa-fw"></i> Add API Key</button>
+
     </div>
     {% for api_form in api_forms %}
             <div class="modal fade" id="edit-key-{{ api_form.key_id.data }}">
@@ -172,6 +172,35 @@
                 {% endcall %}
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="col-md-12 admin-user-groups">
+        <h3><i class="fa fa-fw fa-group"></i> Groups</h3>
+        <hr/>
+        <div class="panel panel-turquoise">
+            <div class="panel-heading">
+                <h3 class="panel-title">Groups</h3>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Group name</th>
+                        <th>Joined on</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                {% for membership in user.groups.all() %}
+                    <tr>
+                        <td>{{ membership.group.name }}</td>
+                        <td>{{ membership.joined_on|format_datetime }}</td>
+                        <td class="text-right">
+                            <div class="btn-group">
+                                {% call macros.render_form(None, action_url=url_for('GroupsView:kick', name=membership.group.name, admin=True), class_="form-inline", btn_class="btn btn-xs btn-danger", action_text='<i class="fa fa-times fa-fw"></i> Kick') %}<input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" value="{{ csrf_token() }}" name="csrf_token">{% endcall %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
     </div>
 </div>

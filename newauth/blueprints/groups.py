@@ -324,10 +324,12 @@ class GroupsView(FlaskView):
         membership = group.members.filter_by(user_id=user_id).first()
         if not membership:
             abort(404)
-        user = membership.user.name
+        user = membership.user
         db.session.delete(membership)
         db.session.commit()
-        flash('User "{}" was removed from the group "{}"'.format(user, group.name), 'success')
+        flash('User "{}" was removed from the group "{}"'.format(user.name, group.name), 'success')
+        if request.args.get('admin'):
+            return redirect(url_for('AdminView:admin_user', user_id=user.user_id))
         return redirect(url_for('GroupsView:get', name=group.name))
 
     @route('<name>/admin/invite', methods=['POST'])
