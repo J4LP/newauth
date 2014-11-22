@@ -93,15 +93,15 @@ class PingsView(FlaskView):
             if scopes_users:
                 if contacts_users:
                     if groups_users:
-                        ping_users = scopes_users & contacts_users & groups_users
+                        ping_users = scopes_users | contacts_users | groups_users
                     else:
-                        ping_users = scopes_users & contacts_users
+                        ping_users = scopes_users | contacts_users
                 else:
                     ping_users = scopes_users
             else:
                 if contacts_users:
                     if groups_users:
-                        ping_users = contacts_users & groups_users
+                        ping_users = contacts_users | groups_users
                     else:
                         ping_users = contacts_users
                 else:
