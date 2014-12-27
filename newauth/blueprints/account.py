@@ -199,7 +199,7 @@ class AccountView(FlaskView):
                 flash('We could not find this user in our database.', 'warning')
                 return redirect(url_for('AccountView:recover'))
             serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-            recover_key = serializer.dumps({'recover': True, 'user_id': form.user_id.data})
+            recover_key = serializer.dumps({'recover': True, 'user_id': user.user_id})
             at_index = user.email.rfind('@')
             obfuscated_email = user.email[0:3] + ('*' * (at_index - 3)) + user.email[at_index:]
             message = Message(
