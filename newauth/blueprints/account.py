@@ -244,6 +244,8 @@ class AccountView(FlaskView):
         form = AccountDoRecoveryForm()
         if form.validate_on_submit():
             user.update_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
             User.password_updated.send(current_app._get_current_object(), model=user, password=form.password.data)
             redis.set('recovery:{}'.format(recover_key_md5), True)
             redis.expire('recovery:{}'.format(recover_key_md5), 60 * 60 * 24)
