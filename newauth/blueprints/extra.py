@@ -13,7 +13,7 @@ class ExtraView(FlaskView):
     def standings(self):
         if request.method == 'POST' and current_user.is_admin():
             update_contacts.delay()
-            return redirect(url_for('AdminView:standings', updated=True))
+            return redirect(url_for('ExtraView:standings', updated=True))
         if request.args.get('updated') and current_user.is_admin():
             flash('Contacts will be updated shortly.', 'success')
         contacts = {
