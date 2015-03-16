@@ -230,9 +230,10 @@ class GroupsView(FlaskView):
         if not membership:
             abort(404)
         # TODO: Maybe send an email ? Allow some text ?
+        user_name = membership.user.name
         db.session.delete(membership)
         db.session.commit()
-        flash("The application from '{}' has been rejected.".format(membership.user.name), 'success')
+        flash("The application from '{}' has been rejected.".format(user_name), 'success')
         return redirect(url_for('GroupsView:get', name=group.name))
 
     @route('/<name>/admin/remove_admin', methods=['POST'])
