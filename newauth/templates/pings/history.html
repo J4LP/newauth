@@ -28,7 +28,7 @@
                         <td><i class="fa fa-fw {{ ping.category.icon }}"></i> {{ ping.category.name }}</td>
                         <td>{{ ping.sender.name }}</td>
                         <td>{{ ping.recipients }}</td>
-                        <td>{{ ping.pings.count()}} {{ 'member'|pluralize(ping.users.count()) }}</td>
+                        <td>{{ ping.users.count()}} {{ 'member'|pluralize(ping.users.count()) }}</td>
                         <td>{{ ping.created_on|format_datetime }} <small>{{ ping.created_on|humanize }}</small></td>
                         <td class="text-right"><a class="btn btn-info btn-xs" href="{{ url_for('PingsView:ping', ping_id=ping.id) }}"><i class="fa fa-fw fa-info"></i> View</a></td>
                     </tr>
