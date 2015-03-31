@@ -23,12 +23,12 @@
                 </tr>
             </thead>
             <tbody>
-                {% for ping in pings %}
+                {% for ping in pings.items %}
                     <tr>
                         <td><i class="fa fa-fw {{ ping.category.icon }}"></i> {{ ping.category.name }}</td>
                         <td>{{ ping.sender.name }}</td>
                         <td>{{ ping.recipients }}</td>
-                        <td>{{ ping.users.count()}} {{ 'member'|pluralize(ping.users.count()) }}</td>
+                        <td>{{ ping.pings.count()}} {{ 'member'|pluralize(ping.pings.count()) }}</td>
                         <td>{{ ping.created_on|format_datetime }} <small>{{ ping.created_on|humanize }}</small></td>
                         <td class="text-right"><a class="btn btn-info btn-xs" href="{{ url_for('PingsView:ping', ping_id=ping.id) }}"><i class="fa fa-fw fa-info"></i> View</a></td>
                     </tr>
@@ -39,6 +39,25 @@
                 {% endfor %}
             </tbody>
         </table>
+        <ul class="pagination pull-right">
+            {% if pings.has_prev %}
+            <li><a href="{{ url_for('PingsView:history', page=pings.prev_num) }}">&laquo;</a></li>
+            {% endif %}
+            {%- for page in pings.iter_pages() %}
+                {% if page %}
+                    {% if page != pings.page %}
+                        <li><a href="{{ url_for('PingsView:history', page=page) }}">{{ page }}</a></li>
+                    {% else %}
+                        <li class="active"><a href="#">{{ page }}</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="#">...</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if pings.has_next %}
+                <li><a href="{{ url_for('PingsView:history', page=pings.next_num) }}">&raquo;</a></li>
+            {% endif %}
+        </ul>
     </div>
 </div>
 {% endblock %}
