@@ -236,7 +236,7 @@ class LDAPSync(object):
             abort(404)
         # They're new!
         if not ldap_user:
-            self.insert_user(current_app, ldap_user)
+            self.insert_user(current_app, user)
         self.save_user(self.get_user(user.user_id), force=True)
         flash('LDAP profile refreshed', 'success')
         return redirect(url_for('AdminView:admin_user', user_id=user_id))
